@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudCore.NotificationHub", "Cloud.Core.NotificationHub\Cloud.Core.NotificationHub.csproj", "{A36DB045-7529-45C1-B8B4-4383AAEEA8A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudCore.NotificationHub.Tests", "Tests\Cloud.Core.NotificationHub.Tests.csproj", "{1FF5C404-CCC3-4FDB-82B1-DA5AEBFD5498}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A36DB045-7529-45C1-B8B4-4383AAEEA8A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A36DB045-7529-45C1-B8B4-4383AAEEA8A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A36DB045-7529-45C1-B8B4-4383AAEEA8A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A36DB045-7529-45C1-B8B4-4383AAEEA8A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FF5C404-CCC3-4FDB-82B1-DA5AEBFD5498}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FF5C404-CCC3-4FDB-82B1-DA5AEBFD5498}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FF5C404-CCC3-4FDB-82B1-DA5AEBFD5498}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FF5C404-CCC3-4FDB-82B1-DA5AEBFD5498}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C2103DAD-1A64-4019-A7D3-292BECEE9ADA}
+	EndGlobalSection
+EndGlobal
