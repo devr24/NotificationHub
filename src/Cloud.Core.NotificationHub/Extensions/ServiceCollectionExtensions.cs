@@ -15,10 +15,7 @@
         /// <returns>IServiceCollection.</returns>
         public static IServiceCollection AddEmailProvider<T>(this IServiceCollection services) where T: class, IEmailProvider
         {
-            services.AddSingleton(p => {
-                ((IEmailProvider)p).Name = nameof(T);
-                return p as T;
-            });
+            services.AddSingleton<IEmailProvider, T>();
             AddFactoryIfNotAdded<T>(services);
             return services;
         }
@@ -29,11 +26,7 @@
         /// <returns>IServiceCollection.</returns>
         public static IServiceCollection AddSmsProvider<T>(this IServiceCollection services) where T : class, ISmsProvider
         {
-
-            services.AddSingleton(p => {
-                ((ISmsProvider)p).Name = nameof(T);
-                return p as T;
-            });
+            services.AddSingleton<ISmsProvider, T>();
             AddFactoryIfNotAdded<T>(services);
             return services;
         }
