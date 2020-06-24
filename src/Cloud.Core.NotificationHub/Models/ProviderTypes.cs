@@ -4,19 +4,21 @@
     public enum EmailProviders
     {
         /// <summary>The SMTP relay provider.</summary>
-        Smtp = 1,
+        SmtpProvider = 1,
         /// <summary>Sendgrid provider.</summary>
-        Sendgrid = 2
+        SendgridProvider = 2,
+        /// <summary>Dummy email provider for testing.</summary>
+        DummyEmailProvider = 3
     }
 
     /// <summary>Sms provider enumeration.</summary>
     public enum SmsProviders
     {
         /// <summary>Clickatel provider.</summary>
-        Clickatel = 1,
+        ClickatelProvider = 1,
         /// <summary>Sendgrid provider.</summary>
-        Sendgrid = 2,
-        /// <summary>Textlocal provider,</summary>
-        Textlocal = 3
+        SendgridProvider = 2,
+        /// <summary>Textlocal provider.</summary>
+        TextlocalProvider = 3
     }
 }
