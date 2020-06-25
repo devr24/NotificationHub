@@ -79,17 +79,22 @@ namespace Cloud.Core.NotificationHub
 
             // Add email providers.
             services.AddEmailProvider<SmtpProvider>()
-                    .AddEmailProvider<SendgridProvider>();
+                    .AddEmailProvider<SendgridProvider>()
+                    .AddEmailProvider<DummyEmailProvider>();
 
             // Add sms providers.
             services.AddSmsProvider<ClickatelProvider>()
-                    .AddSmsProvider<ClickatelProvider>()
-                    .AddSmsProvider<ClickatelProvider>();
+                    .AddSmsProvider<SendgridSmsProvider>()
+                    .AddSmsProvider<TextlocalProvider>();
 
             // Add Mvc 
             services.AddHealthChecks();
             services.AddControllers();
             services.AddSwaggerWithVersions(_appVersions, c => c.IncludeXmlComments("Cloud.Core.NotificationHub.xml"));
+            services.AddVersionedApiExplorer(options => {
+                    options.GroupNameFormat = "'v'VVV";
+                    options.SubstituteApiVersionInUrl = true;
+                });
             services.AddLocalization(o => o.ResourcesPath = "Resources");
             services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
         }
