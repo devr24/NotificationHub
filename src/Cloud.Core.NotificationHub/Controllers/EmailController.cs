@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Threading.Tasks;
+using Cloud.Core.NotificationHub.Models;
 using Cloud.Core.NotificationHub.Providers;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,59 +27,19 @@ namespace Cloud.Core.NotificationHub.Controllers
             _emailProviders = emailProviders;
         }
 
-
-        // GET: api/Notification
-        /// <summary>
-        /// Gets this instance.
-        /// </summary>
-        /// <returns>IEnumerable&lt;System.String&gt;.</returns>
-        [HttpGet(Name = "EmailGetAllV1")]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET: api/Notification/5
-        /// <summary>
-        /// Gets the specified identifier.
-        /// </summary>
-        /// <param name="id">The identifier.</param>
-        /// <returns>System.String.</returns>
-        [HttpGet("{id}", Name = "EmailGetV1")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
         // POST: api/Notification
         /// <summary>
         /// Posts the specified value.
         /// </summary>
-        /// <param name="value">The value.</param>
+        /// <param name="email">The value.</param>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] CreateEmail email)
         {
-        }
+            var emailProvider = _emailProviders[email.Provider.ToString()];
 
-        // PUT: api/Notification/5
-        /// <summary>
-        /// Puts the specified identifier.
-        /// </summary>
-        /// <param name="id">The identifier.</param>
-        /// <param name="value">The value.</param>
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+            await emailProvider.SendAsync(email);
 
-        // DELETE: api/ApiWithActions/5
-        /// <summary>
-        /// Deletes the specified identifier.
-        /// </summary>
-        /// <param name="id">The identifier.</param>
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            return Ok();
         }
     }
 }

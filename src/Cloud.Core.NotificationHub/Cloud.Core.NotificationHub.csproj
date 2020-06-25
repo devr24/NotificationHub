@@ -21,6 +21,7 @@
     <PackageReference Include="Cloud.Core.Storage.AzureBlobStorage" Version="3.1.3530.485" />
     <PackageReference Include="Cloud.Core.Telemetry.AzureAppInsights" Version="3.1.3530.488" />
     <PackageReference Include="Cloud.Core.Web" Version="3.1.3530.480" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.3" />
   </ItemGroup>

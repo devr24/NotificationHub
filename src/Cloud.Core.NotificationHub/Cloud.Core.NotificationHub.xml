@@ -42,37 +42,11 @@
             </summary>
             <param name="emailProviders">The email providers.</param>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.EmailController.Get">
-            <summary>
-            Gets this instance.
-            </summary>
-            <returns>IEnumerable&lt;System.String&gt;.</returns>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.EmailController.Get(System.Int32)">
-            <summary>
-            Gets the specified identifier.
-            </summary>
-            <param name="id">The identifier.</param>
-            <returns>System.String.</returns>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.EmailController.Post(System.String)">
+        <member name="M:Cloud.Core.NotificationHub.Controllers.EmailController.Post(Cloud.Core.NotificationHub.Models.CreateEmail)">
             <summary>
             Posts the specified value.
             </summary>
-            <param name="value">The value.</param>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.EmailController.Put(System.Int32,System.String)">
-            <summary>
-            Puts the specified identifier.
-            </summary>
-            <param name="id">The identifier.</param>
-            <param name="value">The value.</param>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.EmailController.Delete(System.Int32)">
-            <summary>
-            Deletes the specified identifier.
-            </summary>
-            <param name="id">The identifier.</param>
+            <param name="email">The value.</param>
         </member>
         <member name="T:Cloud.Core.NotificationHub.Controllers.NotificationController">
             <summary>
@@ -236,14 +210,82 @@
             <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
             <returns>Task.</returns>
         </member>
+        <member name="T:Cloud.Core.NotificationHub.Models.CreateEmail">
+            <summary>
+            Class Email.
+            </summary>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmail.Provider">
+            <summary>Gets or sets the email provider to use while sending.</summary>
+            <value>The email provider.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmail.To">
+            <summary>Gets or sets the recipient list (send as blind carbon copy).</summary>
+            <value>List of string recipients.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmail.Subject">
+            <summary>Gets or sets the email subject.</summary>
+            <value>The email subject.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmail.TemplateName">
+            <summary>Gets or sets the name of the email template to use.</summary>
+            <value>The name of the template.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmail.Content">
+            <summary>Gets or sets the email content.</summary>
+            <value>The email content.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmail.Attachments">
+            <summary>Gets or sets the email attachments.</summary>
+            <value>The attachments.</value>
+        </member>
+        <member name="T:Cloud.Core.NotificationHub.Models.EmailProviders">
+            <summary>Email provider enumeration.</summary>
+        </member>
+        <member name="F:Cloud.Core.NotificationHub.Models.EmailProviders.SmtpProvider">
+            <summary>The SMTP relay provider.</summary>
+        </member>
+        <member name="F:Cloud.Core.NotificationHub.Models.EmailProviders.SendgridProvider">
+            <summary>Sendgrid provider.</summary>
+        </member>
+        <member name="F:Cloud.Core.NotificationHub.Models.EmailProviders.DummyProvider">
+            <summary>Dummy email provider for testing.</summary>
+        </member>
+        <member name="T:Cloud.Core.NotificationHub.Models.SmsProviders">
+            <summary>Sms provider enumeration.</summary>
+        </member>
+        <member name="F:Cloud.Core.NotificationHub.Models.SmsProviders.ClickatelProvider">
+            <summary>Clickatel provider.</summary>
+        </member>
+        <member name="F:Cloud.Core.NotificationHub.Models.SmsProviders.SendgridProvider">
+            <summary>Sendgrid provider.</summary>
+        </member>
+        <member name="F:Cloud.Core.NotificationHub.Models.SmsProviders.TextlocalProvider">
+            <summary>Textlocal provider.</summary>
+        </member>
+        <member name="T:Cloud.Core.NotificationHub.Models.SmsMessage">
+            <summary>
+            Class Sms Message.
+            </summary>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.SmsMessage.To">
+            <summary>Gets or sets the recipient list.</summary>
+            <value>To.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.SmsMessage.Text">
+            <summary>Gets or sets the message text.</summary>
+            <value>The text.</value>
+        </member>
+        <member name="T:Cloud.Core.NotificationHub.Program">
+            <summary> Main application class.</summary>
+        </member>
+        <member name="M:Cloud.Core.NotificationHub.Program.Main(System.String[])">
+            <summary>Defines the entry point of the application.</summary>
+        </member>
         <member name="T:Cloud.Core.NotificationHub.Providers.EmailMessage">
             <summary>
             Class Email Message.
             </summary>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.EmailMessage.Provider">
-            <summary>Gets or sets the email provider to use while sending.</summary>
-            <value>The email provider.</value>
         </member>
         <member name="P:Cloud.Core.NotificationHub.Providers.EmailMessage.To">
             <summary>Gets or sets the recipient list (send as blind carbon copy).</summary>
@@ -264,6 +306,21 @@
         <member name="P:Cloud.Core.NotificationHub.Providers.EmailMessage.Attachments">
             <summary>Gets or sets the email attachments.</summary>
             <value>The attachments.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Providers.Email.DummyProvider.Name">
+            <summary>Gets or sets the name for the implementor of the INamedInstance interface.</summary>
+            <value>The name of this instance.</value>
+        </member>
+        <member name="M:Cloud.Core.NotificationHub.Providers.Email.DummyProvider.Send(Cloud.Core.NotificationHub.Providers.EmailMessage)">
+            <summary>Sends the specified email.</summary>
+            <param name="email">The email to send.</param>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:Cloud.Core.NotificationHub.Providers.Email.DummyProvider.SendAsync(Cloud.Core.NotificationHub.Providers.EmailMessage)">
+            <summary>Sends the email asynchronously.</summary>
+            <param name="email">The email to send.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.NotImplementedException"></exception>
         </member>
         <member name="T:Cloud.Core.NotificationHub.Providers.Email.SendgridProvider">
             <summary>
@@ -468,46 +525,6 @@
             <param name="message">The message.</param>
             <returns>Task.</returns>
             <exception cref="T:System.NotImplementedException"></exception>
-        </member>
-        <member name="T:Cloud.Core.NotificationHub.Models.EmailProviders">
-            <summary>Email provider enumeration.</summary>
-        </member>
-        <member name="F:Cloud.Core.NotificationHub.Models.EmailProviders.Smtp">
-            <summary>The SMTP relay provider.</summary>
-        </member>
-        <member name="F:Cloud.Core.NotificationHub.Models.EmailProviders.Sendgrid">
-            <summary>Sendgrid provider.</summary>
-        </member>
-        <member name="T:Cloud.Core.NotificationHub.Models.SmsProviders">
-            <summary>Sms provider enumeration.</summary>
-        </member>
-        <member name="F:Cloud.Core.NotificationHub.Models.SmsProviders.Clickatel">
-            <summary>Clickatel provider.</summary>
-        </member>
-        <member name="F:Cloud.Core.NotificationHub.Models.SmsProviders.Sendgrid">
-            <summary>Sendgrid provider.</summary>
-        </member>
-        <member name="F:Cloud.Core.NotificationHub.Models.SmsProviders.Textlocal">
-            <summary>Textlocal provider,</summary>
-        </member>
-        <member name="T:Cloud.Core.NotificationHub.Models.SmsMessage">
-            <summary>
-            Class Sms Message.
-            </summary>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.SmsMessage.To">
-            <summary>Gets or sets the recipient list.</summary>
-            <value>To.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.SmsMessage.Text">
-            <summary>Gets or sets the message text.</summary>
-            <value>The text.</value>
-        </member>
-        <member name="T:Cloud.Core.NotificationHub.Program">
-            <summary> Main application class.</summary>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Program.Main(System.String[])">
-            <summary>Defines the entry point of the application.</summary>
         </member>
         <member name="T:Cloud.Core.NotificationHub.Startup">
             <summary>Class Startup.</summary>

@@ -1,5 +1,4 @@
-﻿using Cloud.Core;
-using Cloud.Core.Messaging.AzureServiceBus.Models;
+﻿using Cloud.Core.Messaging.AzureServiceBus.Models;
 using Cloud.Core.NotificationHub.HostedServices;
 using Cloud.Core.NotificationHub.Extensions;
 using Cloud.Core.NotificationHub.Providers.Email;
@@ -44,18 +43,22 @@ namespace Cloud.Core.NotificationHub
             services.AddSingleton(_appSettings);
 
             // Add two instances of the service bus client.
-            services.AddServiceBusSingletonNamed<IReactiveMessenger>("email", new sbConfig.ConnectionConfig {
+            services.AddServiceBusSingletonNamed<IReactiveMessenger>("email", new sbConfig.ConnectionConfig
+            {
                 ConnectionString = _configuration["serviceBusConnection"],
-                Receiver = new ReceiverSetup {
+                Receiver = new ReceiverSetup
+                {
                     EntityType = EntityType.Topic,
                     EntityName = "notification-hub",
                     EntitySubscriptionName = "email",
                     CreateEntityIfNotExists = true,
                 }
             });
-            services.AddServiceBusSingletonNamed<IReactiveMessenger>("sms", new sbConfig.ConnectionConfig {
+            services.AddServiceBusSingletonNamed<IReactiveMessenger>("sms", new sbConfig.ConnectionConfig
+            {
                 ConnectionString = _configuration["serviceBusConnection"],
-                Receiver = new ReceiverSetup {
+                Receiver = new ReceiverSetup
+                {
                     EntityType = EntityType.Topic,
                     EntityName = "notification-hub",
                     EntitySubscriptionName = "sms",
@@ -64,7 +67,8 @@ namespace Cloud.Core.NotificationHub
             });
 
             // Add blob storage instance.
-            services.AddBlobStorageSingleton(new blobConfig.ConnectionConfig { 
+            services.AddBlobStorageSingleton(new blobConfig.ConnectionConfig
+            {
                 ConnectionString = _configuration["storageConnection"],
                 CreateFolderIfNotExists = true
             });
@@ -80,7 +84,7 @@ namespace Cloud.Core.NotificationHub
             // Add email providers.
             services.AddEmailProvider<SmtpProvider>()
                     .AddEmailProvider<SendgridProvider>()
-                    .AddEmailProvider<DummyEmailProvider>();
+                    .AddEmailProvider<DummyProvider>();
 
             // Add sms providers.
             services.AddSmsProvider<ClickatelProvider>()
@@ -92,9 +96,9 @@ namespace Cloud.Core.NotificationHub
             services.AddControllers();
             services.AddSwaggerWithVersions(_appVersions, c => c.IncludeXmlComments("Cloud.Core.NotificationHub.xml"));
             services.AddVersionedApiExplorer(options => {
-                    options.GroupNameFormat = "'v'VVV";
-                    options.SubstituteApiVersionInUrl = true;
-                });
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
+            });
             services.AddLocalization(o => o.ResourcesPath = "Resources");
             services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
         }

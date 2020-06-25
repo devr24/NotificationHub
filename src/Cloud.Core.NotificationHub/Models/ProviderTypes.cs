@@ -8,7 +8,7 @@
         /// <summary>Sendgrid provider.</summary>
         SendgridProvider = 2,
         /// <summary>Dummy email provider for testing.</summary>
-        DummyEmailProvider = 3
+        DummyProvider = 3
     }
 
     /// <summary>Sms provider enumeration.</summary>

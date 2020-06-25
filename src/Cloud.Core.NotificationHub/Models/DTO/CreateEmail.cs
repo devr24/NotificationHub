@@ -1,24 +1,23 @@
-﻿namespace Cloud.Core.NotificationHub.Providers
-{
-    using Cloud.Core.NotificationHub.Models;
-    using Microsoft.AspNetCore.Http;
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
+namespace Cloud.Core.NotificationHub.Models
+{
     /// <summary>
-    /// Class Email Message.
+    /// Class Email.
     /// </summary>
-    public class EmailMessage
+    public class CreateEmail
     {
         /// <summary>Gets or sets the email provider to use while sending.</summary>
         /// <value>The email provider.</value>
-        public EmailProviders? Provider { get; set; } = EmailProviders.Smtp;
+        public EmailProviders? Provider { get; set; } = EmailProviders.SmtpProvider;
 
         /// <summary>Gets or sets the recipient list (send as blind carbon copy).</summary>
         /// <value>List of string recipients.</value>
         [Required]
-        public List<string> To { get; set;  }
-        
+        public List<string> To { get; set; }
+
         /// <summary>Gets or sets the email subject.</summary>
         /// <value>The email subject.</value>
         [Required]
@@ -31,7 +30,7 @@
         /// <summary>Gets or sets the email content.</summary>
         /// <value>The email content.</value>
         [Required]
-        public string Content { get; set;  }
+        public string Content { get; set; }
 
         /// <summary>Gets or sets the email attachments.</summary>
         /// <value>The attachments.</value>
