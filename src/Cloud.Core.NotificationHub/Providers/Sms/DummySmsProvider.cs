@@ -1,9 +1,10 @@
 ﻿using System.Threading.Tasks;
+using Cloud.Core.NotificationHub.Models;
 using Microsoft.Extensions.Logging;
 
-namespace Cloud.Core.NotificationHub.Providers.Email
+namespace Cloud.Core.NotificationHub.Providers.Sms
 {
-    public class DummySmsProvider : IEmailProvider
+    public class DummySmsProvider : ISmsProvider
     {
         private readonly ILogger<DummySmsProvider> _logger;
 
@@ -17,22 +18,22 @@ namespace Cloud.Core.NotificationHub.Providers.Email
         public string Name { get; set; }
 
         /// <summary>Sends the specified email.</summary>
-        /// <param name="email">The email to send.</param>
+        /// <param name="sms">The email to send.</param>
         /// <exception cref="System.NotImplementedException"></exception>
-        public void Send(EmailMessage email)
+        public void Send(SmsMessage sms)
         {
             _logger.LogInformation("Sms sent successfully");
         }
 
         /// <summary>Sends the email asynchronously.</summary>
-        /// <param name="email">The email to send.</param>
+        /// <param name="sms">The email to send.</param>
         /// <returns>Task.</returns>
         /// <exception cref="System.NotImplementedException"></exception>
-        public Task SendAsync(EmailMessage email)
+        public Task SendAsync(SmsMessage sms)
         {
             _logger.LogInformation("Sms sent successfully");
 
-            return Task.FromResult(email);
+            return Task.FromResult(sms);
         }
     }
 }

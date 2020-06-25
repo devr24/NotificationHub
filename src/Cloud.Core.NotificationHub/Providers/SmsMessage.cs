@@ -1,6 +1,7 @@
 ﻿namespace Cloud.Core.NotificationHub.Models
 {
     using System.Collections.Generic;
+    using Cloud.Core.NotificationHub.Models.DTO;
 
     /// <summary>
     /// Class Sms Message.
@@ -14,5 +15,17 @@
         /// <summary>Gets or sets the message text.</summary>
         /// <value>The text.</value>
         public string Text { get; set; }
+
+        public static implicit operator SmsMessage(CreateSms sms)
+        {
+            var smsMessage = new SmsMessage
+            {
+                To = sms.To,
+                Text = sms.Text
+            };
+
+            return smsMessage;
+
+        }
     }
 }

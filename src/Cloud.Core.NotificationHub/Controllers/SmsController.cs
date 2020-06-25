@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Threading.Tasks;
+using Cloud.Core.NotificationHub.Models.DTO;
+using Cloud.Core.NotificationHub.Providers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cloud.Core.NotificationHub.Controllers
@@ -14,58 +16,30 @@ namespace Cloud.Core.NotificationHub.Controllers
     [Produces("application/json")]
     public class SmsController : ControllerBase
     {
-        // GET: api/Notification
-        /// <summary>
-        /// Gets this instance.
-        /// </summary>
-        /// <returns>IEnumerable&lt;System.String&gt;.</returns>
-        [HttpGet(Name = "SmsGetAllV1")]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
+        private readonly NamedInstanceFactory<ISmsProvider> _smsProviders;
 
-        // GET: api/Notification/5
         /// <summary>
-        /// Gets the specified identifier.
+        /// Initializes a new instance of the <see cref="SmsController"/> class.
         /// </summary>
-        /// <param name="id">The identifier.</param>
-        /// <returns>System.String.</returns>
-        [HttpGet("{id}", Name = "SmsGetV1")]
-        public string Get(int id)
+        /// <param name="smsProviders"></param>
+        public SmsController(NamedInstanceFactory<ISmsProvider> smsProviders)
         {
-            return null;
+            _smsProviders = smsProviders;
         }
 
         // POST: api/Notification
         /// <summary>
         /// Posts the specified value.
         /// </summary>
-        /// <param name="value">The value.</param>
+        /// <param name="sms">The value.</param>
         [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
+        public async Task<IActionResult> Post([FromBody] CreateSms sms)
+        { 
+            var smsProvider = _smsProviders[sms.Provider.ToString()];
 
-        // PUT: api/Notification/5
-        /// <summary>
-        /// Puts the specified identifier.
-        /// </summary>
-        /// <param name="id">The identifier.</param>
-        /// <param name="value">The value.</param>
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+            await smsProvider.SendAsync(sms);
 
-        // DELETE: api/ApiWithActions/5
-        /// <summary>
-        /// Deletes the specified identifier.
-        /// </summary>
-        /// <param name="id">The identifier.</param>
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            return Ok();
         }
     }
 }

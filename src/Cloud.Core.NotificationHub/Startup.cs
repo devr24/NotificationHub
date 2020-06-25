@@ -89,7 +89,8 @@ namespace Cloud.Core.NotificationHub
             // Add sms providers.
             services.AddSmsProvider<ClickatelProvider>()
                     .AddSmsProvider<SendgridSmsProvider>()
-                    .AddSmsProvider<TextlocalProvider>();
+                    .AddSmsProvider<TextlocalProvider>()
+                    .AddSmsProvider<DummySmsProvider>();
 
             // Add Mvc 
             services.AddHealthChecks();

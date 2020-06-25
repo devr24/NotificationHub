@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Cloud.Core.NotificationHub.Models
 {
     /// <summary>
-    /// Class Email.
+    /// Class CreateEmail.
     /// </summary>
     public class CreateEmail
     {
