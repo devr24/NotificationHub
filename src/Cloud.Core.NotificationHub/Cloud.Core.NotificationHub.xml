@@ -235,10 +235,6 @@
             <summary>Gets or sets the email content.</summary>
             <value>The email content.</value>
         </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmail.Attachments">
-            <summary>Gets or sets the email attachments.</summary>
-            <value>The attachments.</value>
-        </member>
         <member name="T:Cloud.Core.NotificationHub.Models.EmailProviders">
             <summary>Email provider enumeration.</summary>
         </member>
@@ -248,7 +244,7 @@
         <member name="F:Cloud.Core.NotificationHub.Models.EmailProviders.SendgridProvider">
             <summary>Sendgrid provider.</summary>
         </member>
-        <member name="F:Cloud.Core.NotificationHub.Models.EmailProviders.DummyProvider">
+        <member name="F:Cloud.Core.NotificationHub.Models.EmailProviders.DummyEmailProvider">
             <summary>Dummy email provider for testing.</summary>
         </member>
         <member name="T:Cloud.Core.NotificationHub.Models.SmsProviders">
@@ -307,16 +303,16 @@
             <summary>Gets or sets the email attachments.</summary>
             <value>The attachments.</value>
         </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.Email.DummyProvider.Name">
+        <member name="P:Cloud.Core.NotificationHub.Providers.Email.DummyEmailProvider.Name">
             <summary>Gets or sets the name for the implementor of the INamedInstance interface.</summary>
             <value>The name of this instance.</value>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.DummyProvider.Send(Cloud.Core.NotificationHub.Providers.EmailMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Email.DummyEmailProvider.Send(Cloud.Core.NotificationHub.Providers.EmailMessage)">
             <summary>Sends the specified email.</summary>
             <param name="email">The email to send.</param>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.DummyProvider.SendAsync(Cloud.Core.NotificationHub.Providers.EmailMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Email.DummyEmailProvider.SendAsync(Cloud.Core.NotificationHub.Providers.EmailMessage)">
             <summary>Sends the email asynchronously.</summary>
             <param name="email">The email to send.</param>
             <returns>Task.</returns>
@@ -409,6 +405,21 @@
             <summary>Creates the email message.</summary>
             <param name="message">The message.</param>
             <returns>System.Net.Mail.MailMessage.</returns>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Providers.Email.DummySmsProvider.Name">
+            <summary>Gets or sets the name for the implementor of the INamedInstance interface.</summary>
+            <value>The name of this instance.</value>
+        </member>
+        <member name="M:Cloud.Core.NotificationHub.Providers.Email.DummySmsProvider.Send(Cloud.Core.NotificationHub.Providers.EmailMessage)">
+            <summary>Sends the specified email.</summary>
+            <param name="email">The email to send.</param>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:Cloud.Core.NotificationHub.Providers.Email.DummySmsProvider.SendAsync(Cloud.Core.NotificationHub.Providers.EmailMessage)">
+            <summary>Sends the email asynchronously.</summary>
+            <param name="email">The email to send.</param>
+            <returns>Task.</returns>
+            <exception cref="T:System.NotImplementedException"></exception>
         </member>
         <member name="T:Cloud.Core.NotificationHub.Providers.IEmailProvider">
             <summary>

@@ -84,7 +84,7 @@ namespace Cloud.Core.NotificationHub
             // Add email providers.
             services.AddEmailProvider<SmtpProvider>()
                     .AddEmailProvider<SendgridProvider>()
-                    .AddEmailProvider<DummyProvider>();
+                    .AddEmailProvider<DummyEmailProvider>();
 
             // Add sms providers.
             services.AddSmsProvider<ClickatelProvider>()

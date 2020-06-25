@@ -3,11 +3,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Cloud.Core.NotificationHub.Providers.Email
 {
-    public class DummyProvider : IEmailProvider
+    public class DummyEmailProvider : IEmailProvider
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<DummyEmailProvider> _logger;
 
-        public DummyProvider(ILogger logger)
+        public DummyEmailProvider(ILogger<DummyEmailProvider> logger)
         {
             _logger = logger;
         }
@@ -21,7 +21,7 @@ namespace Cloud.Core.NotificationHub.Providers.Email
         /// <exception cref="System.NotImplementedException"></exception>
         public void Send(EmailMessage email)
         {
-            _logger.LogInformation("email sent successfully");
+            _logger.LogInformation("Email sent successfully");
         }
 
         /// <summary>Sends the email asynchronously.</summary>
@@ -30,7 +30,7 @@ namespace Cloud.Core.NotificationHub.Providers.Email
         /// <exception cref="System.NotImplementedException"></exception>
         public Task SendAsync(EmailMessage email)
         {
-            _logger.LogInformation("email sent successfully");
+            _logger.LogInformation("Email sent successfully");
 
             return Task.FromResult(email);
         }

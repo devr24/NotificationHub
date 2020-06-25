@@ -16,7 +16,7 @@
         public static IServiceCollection AddEmailProvider<T>(this IServiceCollection services) where T: class, IEmailProvider
         {
             services.AddSingleton<IEmailProvider, T>();
-            AddFactoryIfNotAdded<T>(services);
+            AddFactoryIfNotAdded<IEmailProvider>(services);
             return services;
         }
 
@@ -27,7 +27,7 @@
         public static IServiceCollection AddSmsProvider<T>(this IServiceCollection services) where T : class, ISmsProvider
         {
             services.AddSingleton<ISmsProvider, T>();
-            AddFactoryIfNotAdded<T>(services);
+            AddFactoryIfNotAdded<ISmsProvider>(services);
             return services;
         }
 

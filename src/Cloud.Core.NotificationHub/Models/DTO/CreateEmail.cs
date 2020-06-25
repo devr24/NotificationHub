@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
 
 namespace Cloud.Core.NotificationHub.Models
 {
@@ -34,6 +33,6 @@ namespace Cloud.Core.NotificationHub.Models
 
         /// <summary>Gets or sets the email attachments.</summary>
         /// <value>The attachments.</value>
-        public IFormFileCollection Attachments { get; set; }
+        //public IFormFileCollection Attachments { get; set; } TOD: Replace with a more suitable file variable
     }
 }

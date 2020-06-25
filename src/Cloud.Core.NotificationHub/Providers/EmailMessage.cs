@@ -39,7 +39,7 @@ namespace Cloud.Core.NotificationHub.Providers
             {
                 To = email.To,
                 Subject = email.Subject,
-                Attachments = email.Attachments,
+               // Attachments = email.Attachments,
                 Content = email.Content,
                 TemplateName = email.TemplateName
             };
