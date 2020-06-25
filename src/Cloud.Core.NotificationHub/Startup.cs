@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using blobConfig = Cloud.Core.Storage.AzureBlobStorage.Config;
 using sbConfig = Cloud.Core.Messaging.AzureServiceBus.Config;
+using System.Text.Json.Serialization;
 
 namespace Cloud.Core.NotificationHub
 {
@@ -96,12 +97,15 @@ namespace Cloud.Core.NotificationHub
             services.AddHealthChecks();
             services.AddControllers();
             services.AddSwaggerWithVersions(_appVersions, c => c.IncludeXmlComments("Cloud.Core.NotificationHub.xml"));
-            services.AddVersionedApiExplorer(options => {
+            services.AddVersionedApiExplorer(options =>
+            {
                 options.GroupNameFormat = "'v'VVV";
                 options.SubstituteApiVersionInUrl = true;
             });
             services.AddLocalization(o => o.ResourcesPath = "Resources");
             services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
+            services.AddMvc()
+                    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         }
 
         /// <summary>Configures the specified application.</summary>

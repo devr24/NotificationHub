@@ -77,6 +77,12 @@
             </summary>
             <seealso cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
         </member>
+        <member name="M:Cloud.Core.NotificationHub.Controllers.SmsController.#ctor(Cloud.Core.NamedInstanceFactory{Cloud.Core.NotificationHub.Providers.ISmsProvider})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cloud.Core.NotificationHub.Controllers.SmsController"/> class.
+            </summary>
+            <param name="smsProviders"></param>
+        </member>
         <member name="M:Cloud.Core.NotificationHub.Controllers.SmsController.Post(Cloud.Core.NotificationHub.Models.DTO.CreateSms)">
             <summary>
             Posts the specified value.
@@ -186,7 +192,7 @@
         </member>
         <member name="T:Cloud.Core.NotificationHub.Models.CreateEmail">
             <summary>
-            Class Email.
+            Class CreateEmail.
             </summary>
         </member>
         <member name="P:Cloud.Core.NotificationHub.Models.CreateEmail.Provider">
@@ -208,6 +214,11 @@
         <member name="P:Cloud.Core.NotificationHub.Models.CreateEmail.Content">
             <summary>Gets or sets the email content.</summary>
             <value>The email content.</value>
+        </member>
+        <member name="T:Cloud.Core.NotificationHub.Models.DTO.CreateSms">
+            <summary>
+            Class CreateSms
+            </summary>
         </member>
         <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateSms.Provider">
             <summary>Gets or sets the sms provider to use while sending.</summary>
