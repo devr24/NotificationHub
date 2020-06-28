@@ -3,7 +3,6 @@
 ## Problem Description
 There is a need from many solutions to send notifications for particular events. An example would be sending an Order Invoice email to a customer when an order is created or sending an Sms notifications tracking events i.e Order is being packed, Order shipped, Order is with the courier etc.
 
-Currently, we have a heavy reliance on the eMailer eCron in Monolith for emails, as well as some of our applications integrating directly with Sendgrid. Obvious drawbacks from the emailer eCron is that its our old technology that’s due to be decommissioned as part of hollow-out work. Drawbacks from applications integrating directly are the development and repeating of code, as well as support and maintenance of similar code in multiple places.
 
 ## Solution Overview
 Development of a single “Notification Hub” microservice, that can exist on the evo platform, handling the brokering of multiple notification types to recipients.
@@ -14,7 +13,8 @@ The Notification Hub should be a true microservice that is self-sufficient (no c
 
 The following diagram outlines the proposed design:
 
-Platform (Project OPUS) > Notification Hub - Solution Intent > NotificationHub.png
+![Notification Hub](content/NotificationHub.png)
+
 1. Web API - request can be made to create a notification, if valid, it will add it to the queue.
 2. Service Bus Queue - queue rather than topic as we don't need multiple subscribers to the same topic, we just need a single queue to work thought with regards sending notifications.
 3. Notification Handler - reads the messages from the queue and sends the notification types to the recipient. The scalable part of the Notification Hub - if we want to speed up processing mails, then we can scale this part of the microservice.
@@ -54,11 +54,11 @@ TBC - this may not be needed(?)
 ## Proof of Concept
 The proof of concept will be a single application that does both the web API aspect and the event driven processing - this can later be split into two applications for the scalability needed. The code within will be segregated so it’s easier to split.
 
-Platform (Project OPUS) > Notification Hub - Solution Intent > NotificationHubPROTO.png
+![Notification Hub](content/NotificationHubPOC.png)
+
 The proof of concept will only implement the Sendgrid email provider, to prove the application works as expected.
 
 ## Roadmap
 The following roadmap will show the plan for continued development of the notification hub. There are no timelines associated with this as I have no clear indiciation of how important this work is, stacked up against other work that’s going on.
 
-Platform (Project OPUS) > Notification Hub - Solution Intent > timeline.png
- 
+![Notification Hub](content/timeline.png)
