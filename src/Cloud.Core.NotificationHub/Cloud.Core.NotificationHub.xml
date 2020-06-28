@@ -29,6 +29,27 @@
             <summary>Gets or sets the default SMS provider.</summary>
             <value>The default SMS provider.</value>
         </member>
+        <member name="T:Cloud.Core.NotificationHub.Controllers.AttachmentController">
+            <summary>
+            Class EmailController.
+            Implements the <see cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
+            </summary>
+            <seealso cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
+        </member>
+        <member name="M:Cloud.Core.NotificationHub.Controllers.AttachmentController.#ctor(Cloud.Core.NamedInstanceFactory{Cloud.Core.NotificationHub.Providers.IEmailProvider})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cloud.Core.NotificationHub.Controllers.EmailController"/> class.
+            </summary>
+            <param name="emailProviders">The email providers.</param>
+        </member>
+        <member name="M:Cloud.Core.NotificationHub.Controllers.AttachmentController.Get(Cloud.Core.NotificationHub.Models.CreateEmail)">
+            <summary>Send an email with attachments.</summary>
+            <param name="email">The value.</param>
+        </member>
+        <member name="M:Cloud.Core.NotificationHub.Controllers.AttachmentController.Post(Cloud.Core.NotificationHub.Models.DTO.CreateAttachement)">
+            <summary>Add an attachment into the notification hub that can be sent along with notifications.</summary>
+            <param name="attachement">The attachment to upload.</param>
+        </member>
         <member name="T:Cloud.Core.NotificationHub.Controllers.EmailController">
             <summary>
             Class EmailController.
@@ -42,10 +63,8 @@
             </summary>
             <param name="emailProviders">The email providers.</param>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.EmailController.Post(Cloud.Core.NotificationHub.Models.CreateEmail)">
-            <summary>
-            Posts the specified value.
-            </summary>
+        <member name="M:Cloud.Core.NotificationHub.Controllers.EmailController.CreateEmail(Cloud.Core.NotificationHub.Models.CreateEmail)">
+            <summary>Send an email with attachments.</summary>
             <param name="email">The value.</param>
         </member>
         <member name="T:Cloud.Core.NotificationHub.Controllers.NotificationController">
@@ -190,6 +209,23 @@
             <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
             <returns>Task.</returns>
         </member>
+        <member name="T:Cloud.Core.NotificationHub.Models.DTO.CreateSms">
+            <summary>
+            Class CreateSms
+            </summary>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateSms.Provider">
+            <summary>Gets or sets the sms provider to use while sending.</summary>
+            <value>The sms provider.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateSms.To">
+            <summary>Gets or sets the recipient list.</summary>
+            <value>To.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateSms.Text">
+            <summary>Gets or sets the message text.</summary>
+            <value>The text.</value>
+        </member>
         <member name="T:Cloud.Core.NotificationHub.Models.CreateEmail">
             <summary>
             Class CreateEmail.
@@ -215,22 +251,15 @@
             <summary>Gets or sets the email content.</summary>
             <value>The email content.</value>
         </member>
-        <member name="T:Cloud.Core.NotificationHub.Models.DTO.CreateSms">
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmail.Attachments">
+            <summary>Gets or sets the email attachments.</summary>
+            <value>The attachments.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmail.AttachmentLinks">
             <summary>
-            Class CreateSms
+            Gets or sets the attachment links.
             </summary>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateSms.Provider">
-            <summary>Gets or sets the sms provider to use while sending.</summary>
-            <value>The sms provider.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateSms.To">
-            <summary>Gets or sets the recipient list.</summary>
-            <value>To.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateSms.Text">
-            <summary>Gets or sets the message text.</summary>
-            <value>The text.</value>
+            <value>The attachment links.</value>
         </member>
         <member name="T:Cloud.Core.NotificationHub.Models.EmailProviders">
             <summary>Email provider enumeration.</summary>
