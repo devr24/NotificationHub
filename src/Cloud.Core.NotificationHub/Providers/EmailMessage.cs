@@ -1,10 +1,6 @@
 ﻿using Cloud.Core.NotificationHub.Models;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.Management.ContainerRegistry.Fluent.Models;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Net.Mail;
-using System.Reactive.Subjects;
 
 namespace Cloud.Core.NotificationHub.Providers
 {

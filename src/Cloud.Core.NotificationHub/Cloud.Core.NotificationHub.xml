@@ -29,6 +29,11 @@
             <summary>Gets or sets the default SMS provider.</summary>
             <value>The default SMS provider.</value>
         </member>
+        <member name="P:Cloud.Core.NotificationHub.AppSettings.AllowedAttachmentTypes">
+            <summary>
+            Gets or sets the allowed file types for attachment
+            </summary>
+        </member>
         <member name="T:Cloud.Core.NotificationHub.Controllers.AttachmentController">
             <summary>
             Class EmailController.
@@ -36,19 +41,17 @@
             </summary>
             <seealso cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.AttachmentController.#ctor(Cloud.Core.NamedInstanceFactory{Cloud.Core.NotificationHub.Providers.IEmailProvider})">
+        <member name="M:Cloud.Core.NotificationHub.Controllers.AttachmentController.#ctor(Cloud.Core.NamedInstanceFactory{Cloud.Core.NotificationHub.Providers.IEmailProvider},Cloud.Core.IBlobStorage,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             Initializes a new instance of the <see cref="T:Cloud.Core.NotificationHub.Controllers.EmailController"/> class.
             </summary>
             <param name="emailProviders">The email providers.</param>
+            <param name="blobStorage"></param>
+            <param name="configuration"></param>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.AttachmentController.Get(Cloud.Core.NotificationHub.Models.CreateEmail)">
-            <summary>Send an email with attachments.</summary>
-            <param name="email">The value.</param>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.AttachmentController.Post(Cloud.Core.NotificationHub.Models.DTO.CreateAttachement)">
+        <member name="M:Cloud.Core.NotificationHub.Controllers.AttachmentController.Post(Cloud.Core.NotificationHub.Models.DTO.CreateAttachment)">
             <summary>Add an attachment into the notification hub that can be sent along with notifications.</summary>
-            <param name="attachement">The attachment to upload.</param>
+            <param name="attachment">The attachment to upload.</param>
         </member>
         <member name="T:Cloud.Core.NotificationHub.Controllers.EmailController">
             <summary>

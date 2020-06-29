@@ -1,4 +1,6 @@
-﻿namespace Cloud.Core.NotificationHub
+﻿using System.Collections.Generic;
+
+namespace Cloud.Core.NotificationHub
 {
     /// <summary>
     /// Class App Settings.
@@ -24,5 +26,10 @@
         /// <summary>Gets or sets the default SMS provider.</summary>
         /// <value>The default SMS provider.</value>
         public string DefaultSmsProvider { get; set; }
+
+        /// <summary>
+        /// Gets or sets the allowed file types for attachment
+        /// </summary>
+        public List<string> AllowedAttachmentTypes { get; set; }
     }
 }
