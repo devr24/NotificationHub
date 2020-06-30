@@ -42,7 +42,7 @@ namespace Cloud.Core.NotificationHub
             // Setup application settings (options).
             _appSettings = _configuration.BindBaseSection<AppSettings>();
             services.AddSingleton(_appSettings);
-            _logger.LogInformation(_configuration.GetAllSettingsAsString());
+
             // Add two instances of the service bus client.
             services.AddServiceBusSingletonNamed<IReactiveMessenger>("email", new sbConfig.ConnectionConfig
             {

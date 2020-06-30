@@ -41,11 +41,10 @@
             </summary>
             <seealso cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.AttachmentController.#ctor(Cloud.Core.NamedInstanceFactory{Cloud.Core.NotificationHub.Providers.IEmailProvider},Cloud.Core.IBlobStorage,Cloud.Core.NotificationHub.AppSettings)">
+        <member name="M:Cloud.Core.NotificationHub.Controllers.AttachmentController.#ctor(Cloud.Core.IBlobStorage,Cloud.Core.NotificationHub.AppSettings)">
             <summary>
             Initializes a new instance of the <see cref="T:Cloud.Core.NotificationHub.Controllers.EmailController"/> class.
             </summary>
-            <param name="emailProviders">The email providers.</param>
             <param name="blobStorage"></param>
             <param name="settings"></param>
         </member>
@@ -54,9 +53,9 @@
             <param name="id">Id to attachment.</param>
             <returns></returns>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.AttachmentController.UploadAttachment(Cloud.Core.NotificationHub.Models.DTO.CreateAttachment)">
+        <member name="M:Cloud.Core.NotificationHub.Controllers.AttachmentController.UploadAttachment(Microsoft.AspNetCore.Http.IFormFile)">
             <summary>Add an attachment into the notification hub that can be sent along with notifications.</summary>
-            <param name="createAttachment">The attachment to upload.</param>
+            <param name="attachment">The attachment to upload.</param>
         </member>
         <member name="T:Cloud.Core.NotificationHub.Controllers.EmailController">
             <summary>

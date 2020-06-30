@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Cloud.Core.NotificationHub
 {
@@ -7,7 +8,7 @@ namespace Cloud.Core.NotificationHub
     /// </summary>
     public class AppSettings
     {
-        private string[] _allowedAttachmentTypes;
+        private string _allowedTypes;
 
         /// <summary>Gets the supported cultures.</summary>
         /// <value>The supported cultures.</value>
@@ -29,12 +30,17 @@ namespace Cloud.Core.NotificationHub
         /// <value>The default SMS provider.</value>
         public string DefaultSmsProvider { get; set; }
 
+        public List<string> AllowedAttachmentTypesList { get; private set; }
+
         /// <summary>
         /// Gets or sets the allowed file types for attachment
         /// </summary>
-        public string[] AllowedAttachmentTypes { 
-            get => _allowedAttachmentTypes == null ? new string[] { } : _allowedAttachmentTypes; 
-            set => _allowedAttachmentTypes = value;
+        public string AllowedAttachmentTypes {
+            get => _allowedTypes;
+            set {
+                _allowedTypes = value;
+                AllowedAttachmentTypesList = value.IsNullOrDefault() ? new List<string>() : value.Split(',').ToList();
+            }
         }
     }
 }
