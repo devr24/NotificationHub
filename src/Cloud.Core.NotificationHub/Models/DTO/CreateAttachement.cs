@@ -1,20 +1,12 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 
 namespace Cloud.Core.NotificationHub.Models.DTO
 {
     public class CreateAttachment
     {
-        public IFormFile Content { get; set; }
+        [Required]
+        public IFormFile File { get; set; }
         public bool IsPublic { get; set; }
-        public string ContentText { get; set; }
-
-        [JsonIgnore]
-        internal Stream ContentStream => 
-            ContentText.IsNullOrEmpty() ?
-           Content.OpenReadStream() : ContentText.ConvertToStream(Encoding.UTF8);
     }
 }

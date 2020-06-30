@@ -7,6 +7,8 @@ namespace Cloud.Core.NotificationHub
     /// </summary>
     public class AppSettings
     {
+        private string[] _allowedAttachmentTypes;
+
         /// <summary>Gets the supported cultures.</summary>
         /// <value>The supported cultures.</value>
         public static string[] SupportedCultures { get; } = new string[] { "en" };
@@ -30,6 +32,9 @@ namespace Cloud.Core.NotificationHub
         /// <summary>
         /// Gets or sets the allowed file types for attachment
         /// </summary>
-        public List<string> AllowedAttachmentTypes { get; set; }
+        public string[] AllowedAttachmentTypes { 
+            get => _allowedAttachmentTypes == null ? new string[] { } : _allowedAttachmentTypes; 
+            set => _allowedAttachmentTypes = value;
+        }
     }
 }
