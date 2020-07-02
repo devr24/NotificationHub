@@ -96,7 +96,7 @@
             </summary>
             <param name="logger">The logger.</param>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.PushController.Post(Cloud.Core.NotificationHub.Models.DTO.CreatePushNotification)">
+        <member name="M:Cloud.Core.NotificationHub.Controllers.PushController.Post(Cloud.Core.NotificationHub.Models.DTO.CreatePush)">
             <summary>
             Create push notification for all subscribers
             POST api/v1/values
@@ -133,7 +133,7 @@
             <param name="sms">The sms to send.</param>
             <returns>Async Task IActionResult.</returns>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.SmsController.CreateSmsAsync(Cloud.Core.NotificationHub.Models.DTO.CreateSms)">
+        <member name="M:Cloud.Core.NotificationHub.Controllers.SmsController.CreateSmsAsync(Cloud.Core.NotificationHub.Models.DTO.CreateSmsEvent)">
             <summary>Send an sms with attachments sychronously.</summary>
             <param name="sms">The sms to queue for sending.</param>
             <returns>Async Task IActionResult.</returns>
@@ -217,6 +217,56 @@
             <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
             <returns>Task.</returns>
         </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmailBase.Provider">
+            <summary>Gets or sets the email provider to use while sending.</summary>
+            <value>The email provider.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmailBase.To">
+            <summary>Gets or sets the recipient list (send as blind carbon copy).</summary>
+            <value>List of string recipients.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmailBase.Subject">
+            <summary>Gets or sets the email subject.</summary>
+            <value>The email subject.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmailBase.TemplateName">
+            <summary>Gets or sets the name of the email template to use.</summary>
+            <value>The name of the template.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmailBase.Content">
+            <summary>Gets or sets the email content.</summary>
+            <value>The email content.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmailBase.IsPlainText">
+            <summary>
+            Gets or sets a value indicating whether this instance is plain text.
+            </summary>
+            <value><c>true</c> if this instance is plain text; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmailBase.Links">
+            <summary>
+            Gets or sets the links.
+            </summary>
+            <value>The links.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateSmsBase.Provider">
+            <summary>Gets or sets the sms provider to use while sending.</summary>
+            <value>The sms provider.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateSmsBase.To">
+            <summary>Gets or sets the recipient list.</summary>
+            <value>To.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateSmsBase.Text">
+            <summary>Gets or sets the message text.</summary>
+            <value>The text.</value>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.CreateSmsBase.Links">
+            <summary>
+            Gets or sets the links.
+            </summary>
+            <value>The links.</value>
+        </member>
         <member name="T:Cloud.Core.NotificationHub.Models.DTO.CreateEmail">
             <summary>
             Class CreateEmail.
@@ -226,64 +276,14 @@
             <summary>Gets or sets the email attachments.</summary>
             <value>The attachments.</value>
         </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateEmailBase.Provider">
-            <summary>Gets or sets the email provider to use while sending.</summary>
-            <value>The email provider.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateEmailBase.To">
-            <summary>Gets or sets the recipient list (send as blind carbon copy).</summary>
-            <value>List of string recipients.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateEmailBase.Subject">
-            <summary>Gets or sets the email subject.</summary>
-            <value>The email subject.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateEmailBase.TemplateName">
-            <summary>Gets or sets the name of the email template to use.</summary>
-            <value>The name of the template.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateEmailBase.Content">
-            <summary>Gets or sets the email content.</summary>
-            <value>The email content.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateEmailBase.IsPlainText">
-            <summary>
-            Gets or sets a value indicating whether this instance is plain text.
-            </summary>
-            <value><c>true</c> if this instance is plain text; otherwise, <c>false</c>.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateEmailBase.Links">
-            <summary>
-            Gets or sets the links.
-            </summary>
-            <value>The links.</value>
-        </member>
         <member name="T:Cloud.Core.NotificationHub.Models.DTO.CreateSms">
             <summary>
             Class CreateSms
             </summary>
         </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateSms.Provider">
-            <summary>Gets or sets the sms provider to use while sending.</summary>
-            <value>The sms provider.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateSms.To">
-            <summary>Gets or sets the recipient list.</summary>
-            <value>To.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateSms.Text">
-            <summary>Gets or sets the message text.</summary>
-            <value>The text.</value>
-        </member>
         <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateSms.Attachments">
             <summary>Gets or sets the sms attachments.</summary>
             <value>The attachments.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateSms.Links">
-            <summary>
-            Gets or sets the links.
-            </summary>
-            <value>The links.</value>
         </member>
         <member name="T:Cloud.Core.NotificationHub.Models.Events.EmailEvent">
             <summary>
@@ -336,10 +336,6 @@
         <member name="P:Cloud.Core.NotificationHub.Models.Events.SmsEvent.Text">
             <summary>Gets or sets the message text.</summary>
             <value>The text.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.Events.SmsEvent.Attachments">
-            <summary>Gets or sets the sms attachments.</summary>
-            <value>The attachments.</value>
         </member>
         <member name="P:Cloud.Core.NotificationHub.Models.Events.SmsEvent.Links">
             <summary>

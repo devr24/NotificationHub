@@ -125,7 +125,6 @@ namespace Cloud.Core.NotificationHub
             //    options.GroupNameFormat = "'v'VVV";
             //    options.SubstituteApiVersionInUrl = true;
             //});
-            services.AddLocalization(o => o.ResourcesPath = "Resources");
             services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
             services.AddRouting(options => options.LowercaseUrls = true);
             services.AddMvc().AddJsonOptions(options => { 

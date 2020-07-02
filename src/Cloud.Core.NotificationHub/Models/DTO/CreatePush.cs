@@ -1,6 +1,6 @@
 ﻿namespace Cloud.Core.NotificationHub.Models.DTO
 {
-    public class CreatePushNotification
+    public class CreatePush
     {
         public string EventName { get; set; }
         public string Title { get; set; }

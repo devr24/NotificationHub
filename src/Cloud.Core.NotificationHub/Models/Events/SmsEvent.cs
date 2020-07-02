@@ -23,10 +23,6 @@ namespace Cloud.Core.NotificationHub.Models.Events
         /// <value>The text.</value>
         public string Text { get; set; }
 
-        /// <summary>Gets or sets the sms attachments.</summary>
-        /// <value>The attachments.</value>
-        public List<IFormFile> Attachments { get; set; }
-
         /// <summary>
         /// Gets or sets the links.
         /// </summary>

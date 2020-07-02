@@ -40,7 +40,7 @@ namespace Cloud.Core.NotificationHub.Controllers
         /// <exception cref="InvalidOperationException">Somethings gone wrong!</exception>
         [HttpPost]
         [SwaggerResponse(200, "Example", typeof(string))]
-        public async Task<IActionResult> Post([FromBody] CreatePushNotification createPushNotification)
+        public async Task<IActionResult> Post([FromBody] CreatePush createPushNotification)
         {
             _logger.LogInformation($"Created new push notification for event {createPushNotification.EventName}");
             var defaultLocale = HttpContext.GetRequestLocale();

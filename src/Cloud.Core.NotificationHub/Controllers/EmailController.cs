@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Cloud.Core.NotificationHub.Models.DTO;
 using Cloud.Core.NotificationHub.Models.Events;
@@ -90,11 +89,21 @@ namespace Cloud.Core.NotificationHub.Controllers
         [RequestFormLimits(MultipartBodyLengthLimit = AppSettings.RequestSizeBytesLimit)] // 5mb limit
         public async Task<IActionResult> CreateEmailAsync([FromBody] CreateEmailEvent email)
         {
-            // TODO: REPLACE WITH FLUENT VALIDATION AND CREATE EMAIL VALIDATOR.
+            // TODO: REPLACE WITH FLUENT VALIDATION AND CREATE EMAIL EVENT VALIDATOR.
             // If the model state is invalid (i.e. required fields are missing), then return bad request.
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ApiErrorResult(ModelState));
+            }
+
+            foreach (var attId in email.AttachmentIds)
+            {
+                var filePath = $"{_settings.AttachmentContainerName}/{attId}";
+                if (await _blobStorage.Exists(filePath) == false)
+                {
+                    ModelState.AddModelError("AttachmentId", $"Attachment with id {attId} was not found");
+                    return NotFound(new ApiErrorResult(ModelState));
+                }
             }
 
             // Raise the Email queue event.
