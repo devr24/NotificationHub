@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using blobConfig = Cloud.Core.Storage.AzureBlobStorage.Config;
 using sbConfig = Cloud.Core.Messaging.AzureServiceBus.Config;
 using System.Text.Json.Serialization;
+using Cloud.Core.Services;
 
 namespace Cloud.Core.NotificationHub
 {
@@ -52,6 +53,7 @@ namespace Cloud.Core.NotificationHub
                     EntityType = EntityType.Topic,
                     EntityName = "notification-hub",
                     EntitySubscriptionName = "email",
+                    EntityFilter = new System.Collections.Generic.KeyValuePair<string, string>("EmailFilter", "type LIKE '%email%'"),
                     CreateEntityIfNotExists = true,
                 }
             });
@@ -63,7 +65,30 @@ namespace Cloud.Core.NotificationHub
                     EntityType = EntityType.Topic,
                     EntityName = "notification-hub",
                     EntitySubscriptionName = "sms",
+                    EntityFilter = new System.Collections.Generic.KeyValuePair<string, string>("SmsFilter", "type LIKE '%sms%'"),
                     CreateEntityIfNotExists = true,
+                }
+            });
+            services.AddServiceBusSingletonNamed<IReactiveMessenger>("push", new sbConfig.ConnectionConfig
+            {
+                ConnectionString = _configuration["serviceBusConnection"],
+                Receiver = new ReceiverSetup
+                {
+                    EntityType = EntityType.Topic,
+                    EntityName = "notification-hub",
+                    EntitySubscriptionName = "push",
+                    EntityFilter = new System.Collections.Generic.KeyValuePair<string, string>("PushFilter", "type LIKE '%push%'"),
+                    CreateEntityIfNotExists = true,
+                }
+            });
+            services.AddServiceBusSingletonNamed<IReactiveMessenger>("notification", new sbConfig.ConnectionConfig
+            {
+                ConnectionString = _configuration["serviceBusConnection"],
+                Sender = new SenderSetup
+                {
+                    EntityName = "notification-hub",
+                    EntityType = EntityType.Topic,
+                    CreateEntityIfNotExists = true
                 }
             });
 
@@ -74,15 +99,13 @@ namespace Cloud.Core.NotificationHub
                 CreateFolderIfNotExists = true
             });
 
-            services.AddSingleton(new SmtpConfig { });
+            services.AddSingleton(new MonitorService(_appSettings.MonitorFrequencySeconds));
 
-            services.AddSingleton<MonitorService>();
             services.AddHostedService<EmailService>();
             services.AddHostedService<SmsService>();
 
-            //var rpo = Models.SmsProviders.GetProviders();
-
             // Add email providers.
+            services.AddSingleton(new SmtpConfig { });
             services.AddEmailProvider<SmtpProvider>()
                     .AddEmailProvider<SendgridProvider>()
                     .AddEmailProvider<DummyEmailProvider>();
@@ -97,15 +120,17 @@ namespace Cloud.Core.NotificationHub
             services.AddHealthChecks();
             services.AddControllers();
             services.AddSwaggerWithVersions(_appVersions, c => c.IncludeXmlComments("Cloud.Core.NotificationHub.xml"));
-            services.AddVersionedApiExplorer(options =>
-            {
-                options.GroupNameFormat = "'v'VVV";
-                options.SubstituteApiVersionInUrl = true;
-            });
+            //services.AddVersionedApiExplorer(options =>
+            //{
+            //    options.GroupNameFormat = "'v'VVV";
+            //    options.SubstituteApiVersionInUrl = true;
+            //});
             services.AddLocalization(o => o.ResourcesPath = "Resources");
             services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
-            services.AddMvc()
-                    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+            services.AddRouting(options => options.LowercaseUrls = true);
+            services.AddMvc().AddJsonOptions(options => { 
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
         }
 
         /// <summary>Configures the specified application.</summary>

@@ -1,15 +1,19 @@
-﻿using Cloud.Core.NotificationHub.Models.DTO;
-using Microsoft.AspNetCore.Http;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using Cloud.Core.NotificationHub.Models.DTO;
+using Cloud.Core.NotificationHub.Providers;
 
-namespace Cloud.Core.NotificationHub.Providers
+namespace Cloud.Core.NotificationHub.Models.Events
 {
     /// <summary>
-    /// Class Email Message.
+    /// Class CreateEmail.
     /// </summary>
-    public class EmailMessage
+    public class EmailEvent
     {
+        /// <summary>Gets or sets the email provider to use while sending.</summary>
+        /// <value>The email provider.</value>
+        public EmailProviders? Provider { get; set; } = EmailProviders.SmtpProvider;
+
         /// <summary>Gets or sets the recipient list (send as blind carbon copy).</summary>
         /// <value>List of string recipients.</value>
         public List<string> To { get; set; }
@@ -36,23 +40,19 @@ namespace Cloud.Core.NotificationHub.Providers
 
         /// <summary>Gets or sets the email attachments.</summary>
         /// <value>The attachments.</value>
-        public List<IFormFile> Attachments { get; set; } = new List<IFormFile>();
+        public List<Guid> AttachmentIds { get; set; }
 
-        internal string FullContent
+        public static implicit operator EmailMessage(EmailEvent source)
         {
-            get
+            return new EmailMessage
             {
-                var sb = new StringBuilder();
-                foreach (var link in Links)
-                {
-                    sb.Append(BuildLink(link));
-                }
-                return $"{Content}{sb}";
-            }
-        }
-        private string BuildLink(ResourceLink resource)
-        {
-            return IsPlainText ? $"\n{resource.Name}: {resource.Link}" : $"<br><a href='{resource.Link}'>{resource.Name}</a>";
+                Content = source.Content,
+                IsPlainText = source.IsPlainText,
+                Links = source.Links,
+                Subject = source.Subject,
+                TemplateName = source.TemplateName,
+                To = source.To
+            };
         }
     }
 }

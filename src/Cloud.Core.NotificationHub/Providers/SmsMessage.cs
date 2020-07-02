@@ -1,6 +1,7 @@
-﻿namespace Cloud.Core.NotificationHub.Models
+﻿namespace Cloud.Core.NotificationHub.Providers
 {
     using System.Collections.Generic;
+    using System.Linq;
     using Cloud.Core.NotificationHub.Models.DTO;
 
     /// <summary>
@@ -16,16 +17,12 @@
         /// <value>The text.</value>
         public string Text { get; set; }
 
-        public static implicit operator SmsMessage(CreateSms sms)
-        {
-            var smsMessage = new SmsMessage
-            {
-                To = sms.To,
-                Text = sms.Text
-            };
+        /// <summary>
+        /// Gets or sets the links.
+        /// </summary>
+        /// <value>The links.</value>
+        public List<ResourceLink> Links { get; set; }
 
-            return smsMessage;
-
-        }
+        internal string FullContent => $"{Text}\n{string.Join("\n", Links.Select(l => $"{l.Name}: {l.Link}"))}";
     }
 }

@@ -19,10 +19,9 @@ namespace Cloud.Core.NotificationHub.Providers.Sms
 
         /// <summary>Sends the specified email.</summary>
         /// <param name="sms">The email to send.</param>
-        /// <exception cref="System.NotImplementedException"></exception>
         public void Send(SmsMessage sms)
         {
-            _logger.LogInformation("Sms sent successfully");
+            _logger.LogInformation($"Sms sent successfully, TO: {string.Join(",", sms.To)}, CONTENT: {sms.FullContent}");
         }
 
         /// <summary>Sends the email asynchronously.</summary>
@@ -31,7 +30,7 @@ namespace Cloud.Core.NotificationHub.Providers.Sms
         /// <exception cref="System.NotImplementedException"></exception>
         public Task SendAsync(SmsMessage sms)
         {
-            _logger.LogInformation("Sms sent successfully");
+            _logger.LogInformation($"Sms async sent successfully, TO: {string.Join(",", sms.To)}, CONTENT: {sms.FullContent}");
 
             return Task.FromResult(sms);
         }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 
 namespace Cloud.Core.NotificationHub
 {
@@ -14,9 +15,17 @@ namespace Cloud.Core.NotificationHub
         /// <value>The supported cultures.</value>
         public static string[] SupportedCultures { get; } = new string[] { "en" };
 
+        public static readonly string ContainerName = "attachments";
+
+        public const long IndividualFileSizeBytesLimit = 1048576;
+
+        public const long RequestSizeBytesLimit = 5242880;
+
         /// <summary>Gets the cultures.</summary>
         /// <value>The cultures.</value>
         public string[] Cultures { get { return SupportedCultures; } }
+
+        public string AttachmentContainerName => ContainerName;
 
         /// <summary>Gets or sets the monitor frequency seconds.</summary>
         /// <value>The monitor frequency seconds.</value>

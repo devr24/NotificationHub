@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Cloud.Core.NotificationHub.Models.DTO;
 using Cloud.Core.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,8 +23,6 @@ namespace Cloud.Core.NotificationHub.Controllers
         private readonly IBlobStorage _blobStorage;
         private readonly AppSettings _settings;
 
-        private readonly string ContainerName = "attachments";
-
         /// <summary>
         /// Initializes a new instance of the <see cref="EmailController"/> class.
         /// </summary>
@@ -46,7 +43,7 @@ namespace Cloud.Core.NotificationHub.Controllers
         public async Task<IActionResult> GetAttachment(Guid id)
         {
             const string mimeType = "application/octet-stream";
-            var filePath = $"{ContainerName}/{id}";
+            var filePath = $"{_settings.AttachmentContainerName}/{id}";
 
             // Return not found result if the blob does not exist.
             var exists = await _blobStorage.Exists(filePath);
@@ -57,17 +54,20 @@ namespace Cloud.Core.NotificationHub.Controllers
 
             // Fetch the blob metadata and return the filestream result with the blob.
             var blobData = await _blobStorage.GetBlob(filePath, true);
-            var fileName = $"{blobData.Metadata["name"]}.{blobData.Metadata["ext"]}";
+            var fileName = blobData.Metadata["name"];
 
-            return new FileStreamResult(await _blobStorage.DownloadBlob(filePath), mimeType) { FileDownloadName = fileName };
+            return new FileStreamResult(await _blobStorage.DownloadBlob(filePath), mimeType) 
+            { 
+                FileDownloadName = fileName 
+            };
         }
 
         /// <summary>Add an attachment into the notification hub that can be sent along with notifications.</summary>
         /// <param name="attachment">The attachment to upload.</param>
         [HttpPost(Name = "UploadAttachmentV1")]
-        [RequestFormLimits(MultipartBodyLengthLimit = 5242880)] // 5mb limit
+        [RequestFormLimits(MultipartBodyLengthLimit = AppSettings.IndividualFileSizeBytesLimit)] // 1mb limit
         [SwaggerResponse(400, "Bad request", typeof(ApiErrorResult))]
-        [SwaggerResponse(201, "Attachment uploaded", typeof(Guid))]
+        [SwaggerResponse(202, "Attachment uploaded", typeof(Guid))]
         public async Task<IActionResult> UploadAttachment(IFormFile attachment)
         {
             // If the model state is invalid (i.e. required fields are missing), then return bad request.
@@ -87,21 +87,18 @@ namespace Cloud.Core.NotificationHub.Controllers
             }
             
             var id = Guid.NewGuid();
-            var filePath = $"{ContainerName}/{id}";
+            var filePath = $"{_settings.AttachmentContainerName}/{id}";
 
             // Upload to storage.
             using var uploadStream = attachment.OpenReadStream();
-           
             await _blobStorage.UploadBlob(filePath, uploadStream, new Dictionary<string, string> {
-                { "name", fileName },
-                { "ext", fileExt },
+                { "name", attachment.FileName },
                 { "id", id.ToString() }
             });
-
             uploadStream.Dispose();
 
             // Return the created response.
-            return CreatedAtRoute(nameof(GetAttachment), new { id, version = "1" }, id);
+            return CreatedAtAction(nameof(GetAttachment), new { id, version = "1" }, id);
         }
     }
 }
