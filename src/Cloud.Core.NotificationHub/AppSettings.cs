@@ -13,11 +13,8 @@ namespace Cloud.Core.NotificationHub
         /// <summary>Gets the supported cultures.</summary>
         /// <value>The supported cultures.</value>
         public static string[] SupportedCultures { get; } = new string[] { "en" };
-
-        public static readonly string ContainerName = "attachments";
-
+        public const string ContainerName = "attachments";
         public const long IndividualFileSizeBytesLimit = 1048576;
-
         public const long RequestSizeBytesLimit = 5242880;
 
         /// <summary>Gets the cultures.</summary>
@@ -38,11 +35,11 @@ namespace Cloud.Core.NotificationHub
         /// <value>The default SMS provider.</value>
         public string DefaultSmsProvider { get; set; }
 
+        /// <summary>Gets the allowed attachment types list.</summary>
+        /// <value>The allowed attachment types list.</value>
         public List<string> AllowedAttachmentTypesList { get; private set; }
 
-        /// <summary>
-        /// Gets or sets the allowed file types for attachment
-        /// </summary>
+        /// <summary>Gets or sets the allowed file types for attachment.</summary>
         public string AllowedAttachmentTypes {
             get => _allowedTypes;
             set {
@@ -50,5 +47,11 @@ namespace Cloud.Core.NotificationHub
                 AllowedAttachmentTypesList = value.IsNullOrDefault() ? new List<string>() : value.Split(',').ToList();
             }
         }
+
+        public bool IsSmtpConfigured => !SmtpServer.IsNullOrDefault() && !SmtpPort.IsNullOrDefault();
+        public string SmtpServer { get; set; }
+        public string SmtpPort { get; set; }
+        public string SmtpUsername { get; set; }
+        public string SmtpPassword { get; set; }
     }
 }

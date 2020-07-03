@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Cloud.Core.NotificationHub.Models.DTO;
@@ -7,6 +10,7 @@ using Cloud.Core.NotificationHub.Providers;
 using Cloud.Core.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Cloud.Core.NotificationHub.HostedServices
 {
@@ -24,6 +28,8 @@ namespace Cloud.Core.NotificationHub.HostedServices
         private readonly AppSettings _settings;
         private readonly NamedInstanceFactory<ISmsProvider> _smsProviders;
         private int _messagesProcessed = 0;
+        private int _bitlyGenerated = 0;
+        private int _sasUrlsGenerated = 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SmsService" /> class.
@@ -57,8 +63,12 @@ namespace Cloud.Core.NotificationHub.HostedServices
 
             // Customise your statistics logging here.
             _telemetryLogger.LogMetric("Messages Processed", _messagesProcessed);
+            _telemetryLogger.LogMetric("Sas Urls Created", _sasUrlsGenerated);
+            _telemetryLogger.LogMetric("Bitly Urls Created", _bitlyGenerated);
 
             Interlocked.Exchange(ref _messagesProcessed, 0);
+            Interlocked.Exchange(ref _sasUrlsGenerated, 0);
+            Interlocked.Exchange(ref _bitlyGenerated, 0);
         }
 
         /// <summary>start as an asynchronous operation.</summary>
@@ -74,15 +84,31 @@ namespace Cloud.Core.NotificationHub.HostedServices
 
                 foreach (var attachmentId in message.AttachmentIds)
                 {
-                    var path = $"{_settings.AttachmentContainerName}/{attachmentId}";
-                    var blobData = await _blobStorage.GetBlob(path, true);
+                    var sourcePath = $"{_settings.AttachmentContainerName}/{attachmentId}";
+                    var blobData = await _blobStorage.GetBlob(sourcePath, true);
+                    var fileName = blobData.Metadata["name"];
+                    var publicPath = $"{_settings.AttachmentContainerName}/public/{attachmentId}/{fileName}";
 
-                    var sasUrl = await _blobStorage.GetSignedBlobAccessUrl(path, new SignedAccessConfig(new System.Collections.Generic.List<AccessPermission> { AccessPermission.Read }, null));
+                    await ((Storage.AzureBlobStorage.BlobStorage)_blobStorage).CopyFile(sourcePath, publicPath);
+
+                    var sasUrl = await _blobStorage.GetSignedBlobAccessUrl(publicPath, new SignedAccessConfig(new System.Collections.Generic.List<AccessPermission> { AccessPermission.Read }));
+
+                    using (var client = new HttpClient())
+                    {
+                        var jsonString = $"{{\"long_url\": \"{sasUrl}\"}}";
+                        client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", "Bearer 9a1b3d09ab94c953551e801688fdad2131d98652");
+                        var res = await client.PostAsync("https://api-ssl.bitly.com/v4/shorten", new StringContent(jsonString, Encoding.UTF8, "application/json"));
+                        var content = await res.Content.ReadAsStringAsync();
+                        var obj = JsonConvert.DeserializeObject<Bitly>(content);
+                        //sasUrl = obj.link;
+                    }
 
                     sms.Links.Add(new ResourceLink { 
-                        Name = blobData.Metadata["name"],
+                        Name = fileName,
                         Link = new Uri(sasUrl)
                     });
+                    Interlocked.Increment(ref _sasUrlsGenerated);
+                    Interlocked.Increment(ref _bitlyGenerated);
                 }
 
                 await smsProvider.SendAsync(sms);
@@ -103,5 +129,17 @@ namespace Cloud.Core.NotificationHub.HostedServices
         {
             return Task.FromResult(true);
         }
+    }
+
+    public class Bitly
+    {
+            public DateTime created_at { get; set; }
+            public string id { get; set; }
+            public string link { get; set; }
+            public List<object> custom_bitlinks { get; set; }
+            public string long_url { get; set; }
+            public bool archived { get; set; }
+
+        
     }
 }

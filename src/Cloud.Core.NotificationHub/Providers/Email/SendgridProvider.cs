@@ -18,7 +18,7 @@
         /// <exception cref="System.NotImplementedException"></exception>
         public void Send(EmailMessage email)
         {
-            throw new System.NotImplementedException();
+            SendAsync(email).GetAwaiter().GetResult();
         }
 
         /// <summary>Sends the email asynchronously.</summary>

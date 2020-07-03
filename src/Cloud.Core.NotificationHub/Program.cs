@@ -41,7 +41,11 @@ namespace Cloud.Core.NotificationHub
                         "SubscriptionId",
                         "InstrumentationKey",
                         "serviceBusConnection",
-                        "storageConnection");
+                        "storageConnection",
+                        "SmtpServer",
+                        "SmtpPort",
+                        "SmtpUsername",
+                        "SmtpPassword");
                 })
                 .ConfigureLogging((context, logging) => {
                     

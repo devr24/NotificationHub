@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Cloud.Core.NotificationHub.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Cloud.Core.NotificationHub.Providers.Sms
@@ -21,7 +20,7 @@ namespace Cloud.Core.NotificationHub.Providers.Sms
         /// <param name="sms">The email to send.</param>
         public void Send(SmsMessage sms)
         {
-            _logger.LogInformation($"Sms sent successfully, TO: {string.Join(",", sms.To)}, CONTENT: {sms.FullContent}");
+            SendAsync(sms).GetAwaiter().GetResult();
         }
 
         /// <summary>Sends the email asynchronously.</summary>

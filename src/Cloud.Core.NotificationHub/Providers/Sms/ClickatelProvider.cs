@@ -1,5 +1,8 @@
-﻿using Cloud.Core.NotificationHub.Models;
+﻿using System.IO;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Rest.TransientFaultHandling;
 
 namespace Cloud.Core.NotificationHub.Providers.Sms
 {
@@ -10,31 +13,51 @@ namespace Cloud.Core.NotificationHub.Providers.Sms
     /// <seealso cref="ISmsProvider" />
     public class ClickatelProvider : ISmsProvider
     {
+        private readonly HttpClient _httpClient;
+        private readonly AppSettings _settings;
+
         /// <summary>
         /// Gets or sets the name for the implementor of the INamedInstance interface.
         /// </summary>
         /// <value>The name.</value>
         public string Name { get; set; }
 
+        public ClickatelProvider(AppSettings settings)
+        {
+            _httpClient = new HttpClient()
+            {
+                BaseAddress = new System.Uri("https://platform.clickatell.com")
+            };
+
+            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", "tviw6LTBRl6M7_ITTfzQrg==");
+            _settings = settings;
+        }
+
         /// <summary>
         /// Sends the specified message.
         /// </summary>
-        /// <param name="message">The message.</param>
+        /// <param name="sms">The message.</param>
         /// <exception cref="System.NotImplementedException"></exception>
-        public void Send(SmsMessage message)
+        public void Send(SmsMessage sms)
         {
-            throw new System.NotImplementedException();
+            SendAsync(sms).GetAwaiter().GetResult();
         }
 
         /// <summary>
         /// Sends the asynchronous.
         /// </summary>
-        /// <param name="message">The message.</param>
+        /// <param name="sms">The message.</param>
         /// <returns>Task.</returns>
-        /// <exception cref="System.NotImplementedException"></exception>
-        public Task SendAsync(SmsMessage message)
+        public async Task SendAsync(SmsMessage sms)
         {
-            throw new System.NotImplementedException();
+            var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(new { content = sms.FullContent, to = sms.To.ToArray() });
+
+            var res = await _httpClient.PostAsync("/messages", new StringContent(jsonString, Encoding.UTF8, "application/json"));
+
+            if (res.IsSuccessStatusCode == false)
+            {
+                throw new InvalidDataException(res.StatusCode.ToString());
+            }
         }
     }
 }

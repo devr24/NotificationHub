@@ -71,8 +71,9 @@ namespace Cloud.Core.NotificationHub.Controllers
         public async Task<IActionResult> UploadAttachment(IFormFile attachment)
         {
             // If the model state is invalid (i.e. required fields are missing), then return bad request.
-            if (!ModelState.IsValid)
+            if (attachment == null)
             {
+                ModelState.AddModelError("Attachment", "Attachment file is required");
                 return BadRequest(new ApiErrorResult(ModelState));
             }
 

@@ -29,10 +29,12 @@
             <summary>Gets or sets the default SMS provider.</summary>
             <value>The default SMS provider.</value>
         </member>
+        <member name="P:Cloud.Core.NotificationHub.AppSettings.AllowedAttachmentTypesList">
+            <summary>Gets the allowed attachment types list.</summary>
+            <value>The allowed attachment types list.</value>
+        </member>
         <member name="P:Cloud.Core.NotificationHub.AppSettings.AllowedAttachmentTypes">
-            <summary>
-            Gets or sets the allowed file types for attachment
-            </summary>
+            <summary>Gets or sets the allowed file types for attachment.</summary>
         </member>
         <member name="T:Cloud.Core.NotificationHub.Controllers.AttachmentController">
             <summary>
@@ -445,39 +447,6 @@
             <returns>Task.</returns>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
-        <member name="T:Cloud.Core.NotificationHub.Providers.Email.SmtpConfig">
-            <summary>Smtp configuration class.</summary>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.Email.SmtpConfig.From">
-            <summary>
-            Gets or sets from.
-            </summary>
-            <value>From.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.Email.SmtpConfig.SmtpServer">
-            <summary>
-            Gets or sets the SMTP server.
-            </summary>
-            <value>The SMTP server.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.Email.SmtpConfig.Port">
-            <summary>
-            Gets or sets the port.
-            </summary>
-            <value>The port.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.Email.SmtpConfig.UserName">
-            <summary>
-            Gets or sets the name of the user.
-            </summary>
-            <value>The name of the user.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.Email.SmtpConfig.Password">
-            <summary>
-            Gets or sets the password.
-            </summary>
-            <value>The password.</value>
-        </member>
         <member name="T:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider">
             <summary>
             Class Smtp email provider.
@@ -485,17 +454,14 @@
             </summary>
             <seealso cref="T:Cloud.Core.NotificationHub.Providers.IEmailProvider" />
         </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.Configuration">
-            <summary>Gets the configuration.</summary>
-            <value>The configuration.</value>
-        </member>
         <member name="P:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.Name">
             <summary>Gets or sets the name for the implementor of the INamedInstance interface.</summary>
             <value>The name of this instance.</value>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.#ctor(Cloud.Core.NotificationHub.Providers.Email.SmtpConfig)">
-            <summary>Initializes a new instance of the <see cref="T:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider"/> class.</summary>
-            <param name="config">The configuration.</param>
+        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.#ctor(System.Net.Mail.SmtpClient,Cloud.Core.NotificationHub.AppSettings)">
+            <summary>Initializes a new instance of the <see cref="T:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider" /> class.</summary>
+            <param name="smtpClient">The configuration.</param>
+            <param name="settings">The settings.</param>
         </member>
         <member name="M:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.Send(Cloud.Core.NotificationHub.Providers.EmailMessage)">
             <summary>Sends the specified email.</summary>
@@ -579,16 +545,15 @@
             <summary>
             Sends the specified message.
             </summary>
-            <param name="message">The message.</param>
+            <param name="sms">The message.</param>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
         <member name="M:Cloud.Core.NotificationHub.Providers.Sms.ClickatelProvider.SendAsync(Cloud.Core.NotificationHub.Providers.SmsMessage)">
             <summary>
             Sends the asynchronous.
             </summary>
-            <param name="message">The message.</param>
+            <param name="sms">The message.</param>
             <returns>Task.</returns>
-            <exception cref="T:System.NotImplementedException"></exception>
         </member>
         <member name="P:Cloud.Core.NotificationHub.Providers.Sms.DummySmsProvider.Name">
             <summary>Gets or sets the name for the implementor of the INamedInstance interface.</summary>
@@ -621,14 +586,14 @@
             <summary>
             Sends the specified message.
             </summary>
-            <param name="message">The message.</param>
+            <param name="sms">The message.</param>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
         <member name="M:Cloud.Core.NotificationHub.Providers.Sms.SendgridSmsProvider.SendAsync(Cloud.Core.NotificationHub.Providers.SmsMessage)">
             <summary>
             Sends the asynchronous.
             </summary>
-            <param name="message">The message.</param>
+            <param name="sms">The message.</param>
             <returns>Task.</returns>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
@@ -649,14 +614,14 @@
             <summary>
             Sends the specified message.
             </summary>
-            <param name="message">The message.</param>
+            <param name="sms">The message.</param>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
         <member name="M:Cloud.Core.NotificationHub.Providers.Sms.TextlocalProvider.SendAsync(Cloud.Core.NotificationHub.Providers.SmsMessage)">
             <summary>
             Sends the asynchronous.
             </summary>
-            <param name="message">The message.</param>
+            <param name="sms">The message.</param>
             <returns>Task.</returns>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>

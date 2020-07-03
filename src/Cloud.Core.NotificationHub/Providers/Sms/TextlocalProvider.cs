@@ -19,20 +19,20 @@ namespace Cloud.Core.NotificationHub.Providers.Sms
         /// <summary>
         /// Sends the specified message.
         /// </summary>
-        /// <param name="message">The message.</param>
+        /// <param name="sms">The message.</param>
         /// <exception cref="System.NotImplementedException"></exception>
-        public void Send(SmsMessage message)
+        public void Send(SmsMessage sms)
         {
-            throw new System.NotImplementedException();
+            SendAsync(sms).GetAwaiter().GetResult();
         }
 
         /// <summary>
         /// Sends the asynchronous.
         /// </summary>
-        /// <param name="message">The message.</param>
+        /// <param name="sms">The message.</param>
         /// <returns>Task.</returns>
         /// <exception cref="System.NotImplementedException"></exception>
-        public Task SendAsync(SmsMessage message)
+        public Task SendAsync(SmsMessage sms)
         {
             throw new System.NotImplementedException();
         }

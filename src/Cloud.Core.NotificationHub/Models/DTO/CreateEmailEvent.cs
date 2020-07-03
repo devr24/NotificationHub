@@ -6,7 +6,9 @@ namespace Cloud.Core.NotificationHub.Models.DTO
 {
     public class CreateEmailEvent : CreateEmailBase
     {
-        public List<Guid> AttachmentIds { get; set; }
+        private List<Guid> _attachmentIds = new List<Guid>();
+
+        public List<Guid> AttachmentIds { get => _attachmentIds; set { _attachmentIds = value ?? new List<Guid>(); } }
 
         public static implicit operator EmailEvent(CreateEmailEvent source)
         {

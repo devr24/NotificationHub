@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace Cloud.Core.NotificationHub.Models.DTO
 {

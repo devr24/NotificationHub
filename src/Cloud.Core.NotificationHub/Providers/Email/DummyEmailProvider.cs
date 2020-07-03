@@ -21,7 +21,7 @@ namespace Cloud.Core.NotificationHub.Providers.Email
         /// <exception cref="System.NotImplementedException"></exception>
         public void Send(EmailMessage email)
         {
-            _logger.LogInformation($"Email sent successfully, TO: {string.Join(",", email.To)}, CONTENT: {email.FullContent}, TEMPLATE: {email.TemplateName}");
+            SendAsync(email).GetAwaiter().GetResult();
         }
 
         /// <summary>Sends the email asynchronously.</summary>
@@ -30,7 +30,7 @@ namespace Cloud.Core.NotificationHub.Providers.Email
         /// <exception cref="System.NotImplementedException"></exception>
         public Task SendAsync(EmailMessage email)
         {
-            _logger.LogInformation($"Email async sent successfully, TO: {string.Join(",", email.To)}, CONTENT: {email.FullContent}, TEMPLATE: {email.TemplateName}");
+            _logger.LogInformation($"Email sent successfully, TO: {string.Join(",", email.To)}, CONTENT: {email.FullContent}, TEMPLATE: {email.TemplateName}");
 
             return Task.FromResult(email);
         }

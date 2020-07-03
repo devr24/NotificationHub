@@ -14,6 +14,8 @@ using blobConfig = Cloud.Core.Storage.AzureBlobStorage.Config;
 using sbConfig = Cloud.Core.Messaging.AzureServiceBus.Config;
 using System.Text.Json.Serialization;
 using Cloud.Core.Services;
+using System.Net.Mail;
+using System.Net;
 
 namespace Cloud.Core.NotificationHub
 {
@@ -105,9 +107,17 @@ namespace Cloud.Core.NotificationHub
             services.AddHostedService<SmsService>();
 
             // Add email providers.
-            services.AddSingleton(new SmtpConfig { });
-            services.AddEmailProvider<SmtpProvider>()
-                    .AddEmailProvider<SendgridProvider>()
+         
+            if (_appSettings.IsSmtpConfigured) 
+            { 
+                services.AddSingleton(new SmtpClient(_configuration["SmtpServer"], _configuration.GetValue<int>("SmtpPort"))
+                {
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(_configuration["SmtpUsername"], _configuration["SmtpPassword"])
+                });
+                services.AddEmailProvider<SmtpProvider>();
+            }
+            services.AddEmailProvider<SendgridProvider>()
                     .AddEmailProvider<DummyEmailProvider>();
 
             // Add sms providers.
@@ -120,11 +130,6 @@ namespace Cloud.Core.NotificationHub
             services.AddHealthChecks();
             services.AddControllers();
             services.AddSwaggerWithVersions(_appVersions, c => c.IncludeXmlComments("Cloud.Core.NotificationHub.xml"));
-            //services.AddVersionedApiExplorer(options =>
-            //{
-            //    options.GroupNameFormat = "'v'VVV";
-            //    options.SubstituteApiVersionInUrl = true;
-            //});
             services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
             services.AddRouting(options => options.LowercaseUrls = true);
             services.AddMvc().AddJsonOptions(options => { 
