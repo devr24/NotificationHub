@@ -66,7 +66,7 @@
             </summary>
             <seealso cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.EmailController.#ctor(Cloud.Core.NamedInstanceFactory{Cloud.Core.NotificationHub.Providers.IEmailProvider},Cloud.Core.NamedInstanceFactory{Cloud.Core.IReactiveMessenger},Cloud.Core.IBlobStorage,Cloud.Core.NotificationHub.AppSettings)">
+        <member name="M:Cloud.Core.NotificationHub.Controllers.EmailController.#ctor(Cloud.Core.NamedInstanceFactory{Cloud.Core.IEmailProvider},Cloud.Core.NamedInstanceFactory{Cloud.Core.IReactiveMessenger},Cloud.Core.IBlobStorage,Cloud.Core.NotificationHub.AppSettings)">
             <summary>
             Initializes a new instance of the <see cref="T:Cloud.Core.NotificationHub.Controllers.EmailController" /> class.
             </summary>
@@ -121,7 +121,7 @@
             </summary>
             <seealso cref="T:Microsoft.AspNetCore.Mvc.ControllerBase" />
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.SmsController.#ctor(Cloud.Core.NamedInstanceFactory{Cloud.Core.NotificationHub.Providers.ISmsProvider},Cloud.Core.NamedInstanceFactory{Cloud.Core.IReactiveMessenger},Cloud.Core.IBlobStorage,Cloud.Core.NotificationHub.AppSettings)">
+        <member name="M:Cloud.Core.NotificationHub.Controllers.SmsController.#ctor(Cloud.Core.NamedInstanceFactory{Cloud.Core.ISmsProvider},Cloud.Core.NamedInstanceFactory{Cloud.Core.IReactiveMessenger},Cloud.Core.IBlobStorage,Cloud.Core.NotificationHub.AppSettings)">
             <summary>
             Initializes a new instance of the <see cref="T:Cloud.Core.NotificationHub.Controllers.SmsController" /> class.
             </summary>
@@ -140,21 +140,6 @@
             <param name="sms">The sms to queue for sending.</param>
             <returns>Async Task IActionResult.</returns>
         </member>
-        <member name="T:Cloud.Core.NotificationHub.Extensions.ServiceCollectionExtensions">
-            <summary>Class ServiceCollection extensions.</summary>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Extensions.ServiceCollectionExtensions.AddEmailProvider``1(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
-            <summary>Add the email provider.</summary>
-            <typeparam name="T">Type of IEmailProvider.</typeparam>
-            <param name="services">The service collection to add email provider to.</param>
-            <returns>IServiceCollection.</returns>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Extensions.ServiceCollectionExtensions.AddSmsProvider``1(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
-            <summary>Add the sms provider.</summary>
-            <typeparam name="T">Type of ISmsProvider.</typeparam>
-            <param name="services">The service collection to add sms provider to.</param>
-            <returns>IServiceCollection.</returns>
-        </member>
         <member name="T:Cloud.Core.NotificationHub.HostedServices.EmailService">
             <summary>
             Class EmailService.
@@ -162,7 +147,7 @@
             </summary>
             <seealso cref="T:Microsoft.Extensions.Hosting.IHostedService" />
         </member>
-        <member name="M:Cloud.Core.NotificationHub.HostedServices.EmailService.#ctor(Cloud.Core.NamedInstanceFactory{Cloud.Core.NotificationHub.Providers.IEmailProvider},Cloud.Core.NamedInstanceFactory{Cloud.Core.IReactiveMessenger},Cloud.Core.ITelemetryLogger,Microsoft.Extensions.Logging.ILogger{Cloud.Core.NotificationHub.HostedServices.EmailService},Cloud.Core.Services.MonitorService,Cloud.Core.IBlobStorage,Cloud.Core.NotificationHub.AppSettings)">
+        <member name="M:Cloud.Core.NotificationHub.HostedServices.EmailService.#ctor(Cloud.Core.NamedInstanceFactory{Cloud.Core.IEmailProvider},Cloud.Core.NamedInstanceFactory{Cloud.Core.IReactiveMessenger},Cloud.Core.ITelemetryLogger,Microsoft.Extensions.Logging.ILogger{Cloud.Core.NotificationHub.HostedServices.EmailService},Cloud.Core.Services.MonitorService,Cloud.Core.IBlobStorage,Cloud.Core.NotificationHub.AppSettings)">
             <summary>
             Initializes a new instance of the <see cref="T:Cloud.Core.NotificationHub.HostedServices.EmailService" /> class.
             </summary>
@@ -194,7 +179,7 @@
             </summary>
             <seealso cref="T:Microsoft.Extensions.Hosting.IHostedService" />
         </member>
-        <member name="M:Cloud.Core.NotificationHub.HostedServices.SmsService.#ctor(Cloud.Core.NamedInstanceFactory{Cloud.Core.NotificationHub.Providers.ISmsProvider},Cloud.Core.NamedInstanceFactory{Cloud.Core.IReactiveMessenger},Cloud.Core.ITelemetryLogger,Microsoft.Extensions.Logging.ILogger{Cloud.Core.NotificationHub.HostedServices.SmsService},Cloud.Core.Services.MonitorService,Cloud.Core.IBlobStorage,Cloud.Core.NotificationHub.AppSettings)">
+        <member name="M:Cloud.Core.NotificationHub.HostedServices.SmsService.#ctor(Cloud.Core.NamedInstanceFactory{Cloud.Core.ISmsProvider},Cloud.Core.NamedInstanceFactory{Cloud.Core.IReactiveMessenger},Cloud.Core.ITelemetryLogger,Microsoft.Extensions.Logging.ILogger{Cloud.Core.NotificationHub.HostedServices.SmsService},Cloud.Core.Services.MonitorService,Cloud.Core.IBlobStorage,Cloud.Core.NotificationHub.AppSettings)">
             <summary>
             Initializes a new instance of the <see cref="T:Cloud.Core.NotificationHub.HostedServices.SmsService" /> class.
             </summary>
@@ -379,47 +364,16 @@
         <member name="M:Cloud.Core.NotificationHub.Program.Main(System.String[])">
             <summary>Defines the entry point of the application.</summary>
         </member>
-        <member name="T:Cloud.Core.NotificationHub.Providers.EmailMessage">
-            <summary>
-            Class Email Message.
-            </summary>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.EmailMessage.To">
-            <summary>Gets or sets the recipient list (send as blind carbon copy).</summary>
-            <value>List of string recipients.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.EmailMessage.Subject">
-            <summary>Gets or sets the email subject.</summary>
-            <value>The email subject.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.EmailMessage.TemplateName">
-            <summary>Gets or sets the name of the email template to use.</summary>
-            <value>The name of the template.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.EmailMessage.Content">
-            <summary>Gets or sets the email content.</summary>
-            <value>The email content.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.EmailMessage.IsPlainText">
-            <summary>
-            Gets or sets a value indicating whether this instance is plain text.
-            </summary>
-            <value><c>true</c> if this instance is plain text; otherwise, <c>false</c>.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.EmailMessage.Attachments">
-            <summary>Gets or sets the email attachments.</summary>
-            <value>The attachments.</value>
-        </member>
         <member name="P:Cloud.Core.NotificationHub.Providers.Email.DummyEmailProvider.Name">
             <summary>Gets or sets the name for the implementor of the INamedInstance interface.</summary>
             <value>The name of this instance.</value>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.DummyEmailProvider.Send(Cloud.Core.NotificationHub.Providers.EmailMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Email.DummyEmailProvider.Send(Cloud.Core.EmailMessage)">
             <summary>Sends the specified email.</summary>
             <param name="email">The email to send.</param>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.DummyEmailProvider.SendAsync(Cloud.Core.NotificationHub.Providers.EmailMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Email.DummyEmailProvider.SendAsync(Cloud.Core.EmailMessage)">
             <summary>Sends the email asynchronously.</summary>
             <param name="email">The email to send.</param>
             <returns>Task.</returns>
@@ -428,20 +382,20 @@
         <member name="T:Cloud.Core.NotificationHub.Providers.Email.SendgridProvider">
             <summary>
             Class Sendgrid email provider.
-            Implements the <see cref="T:Cloud.Core.NotificationHub.Providers.IEmailProvider" />
+            Implements the <see cref="T:Cloud.Core.IEmailProvider" />
             </summary>
-            <seealso cref="T:Cloud.Core.NotificationHub.Providers.IEmailProvider" />
+            <seealso cref="T:Cloud.Core.IEmailProvider" />
         </member>
         <member name="P:Cloud.Core.NotificationHub.Providers.Email.SendgridProvider.Name">
             <summary>Gets or sets the name for the implementor of the INamedInstance interface.</summary>
             <value>The name of this instance.</value>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SendgridProvider.Send(Cloud.Core.NotificationHub.Providers.EmailMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SendgridProvider.Send(Cloud.Core.EmailMessage)">
             <summary>Sends the specified email.</summary>
             <param name="email">The email to send.</param>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SendgridProvider.SendAsync(Cloud.Core.NotificationHub.Providers.EmailMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SendgridProvider.SendAsync(Cloud.Core.EmailMessage)">
             <summary>Sends the email asynchronously.</summary>
             <param name="email">The email to send.</param>
             <returns>Task.</returns>
@@ -450,9 +404,9 @@
         <member name="T:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider">
             <summary>
             Class Smtp email provider.
-            Implements the <see cref="T:Cloud.Core.NotificationHub.Providers.IEmailProvider" />
+            Implements the <see cref="T:Cloud.Core.IEmailProvider" />
             </summary>
-            <seealso cref="T:Cloud.Core.NotificationHub.Providers.IEmailProvider" />
+            <seealso cref="T:Cloud.Core.IEmailProvider" />
         </member>
         <member name="P:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.Name">
             <summary>Gets or sets the name for the implementor of the INamedInstance interface.</summary>
@@ -463,77 +417,26 @@
             <param name="smtpClient">The configuration.</param>
             <param name="settings">The settings.</param>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.Send(Cloud.Core.NotificationHub.Providers.EmailMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.Send(Cloud.Core.EmailMessage)">
             <summary>Sends the specified email.</summary>
             <param name="email">The email to send.</param>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.SendAsync(Cloud.Core.NotificationHub.Providers.EmailMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.SendAsync(Cloud.Core.EmailMessage)">
             <summary>send as an asynchronous operation.</summary>
             <param name="email">The email to send.</param>
             <returns>Task.</returns>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.CreateEmailMessage(Cloud.Core.NotificationHub.Providers.EmailMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.CreateEmailMessage(Cloud.Core.EmailMessage)">
             <summary>Creates the email message.</summary>
             <param name="message">The message.</param>
             <returns>System.Net.Mail.MailMessage.</returns>
         </member>
-        <member name="T:Cloud.Core.NotificationHub.Providers.IEmailProvider">
-            <summary>
-            Interface IEmailProvider.
-            Implements the <see cref="T:Cloud.Core.INamedInstance" />
-            </summary>
-            <seealso cref="T:Cloud.Core.INamedInstance" />
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.IEmailProvider.Send(Cloud.Core.NotificationHub.Providers.EmailMessage)">
-            <summary>Sends the specified email.</summary>
-            <param name="mail">The email to send.</param>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.IEmailProvider.SendAsync(Cloud.Core.NotificationHub.Providers.EmailMessage)">
-            <summary>Sends the email asynchronously.</summary>
-            <param name="mail">The email to send.</param>
-            <returns>Task.</returns>
-        </member>
-        <member name="T:Cloud.Core.NotificationHub.Providers.ISmsProvider">
-            <summary>
-            Interface ISmsProvider.
-            Implements the <see cref="T:Cloud.Core.INamedInstance" />
-            </summary>
-            <seealso cref="T:Cloud.Core.INamedInstance" />
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.ISmsProvider.Send(Cloud.Core.NotificationHub.Providers.SmsMessage)">
-            <summary>Sends the specified message.</summary>
-            <param name="message">The message to send.</param>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.ISmsProvider.SendAsync(Cloud.Core.NotificationHub.Providers.SmsMessage)">
-            <summary>Sends the message asynchronously.</summary>
-            <param name="message">The message to send.</param>
-            <returns>Task.</returns>
-        </member>
-        <member name="T:Cloud.Core.NotificationHub.Providers.SmsMessage">
-            <summary>
-            Class Sms Message.
-            </summary>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.SmsMessage.To">
-            <summary>Gets or sets the recipient list.</summary>
-            <value>To.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.SmsMessage.Text">
-            <summary>Gets or sets the message text.</summary>
-            <value>The text.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.SmsMessage.Links">
-            <summary>
-            Gets or sets the links.
-            </summary>
-            <value>The links.</value>
-        </member>
         <member name="T:Cloud.Core.NotificationHub.Providers.Sms.ClickatelProvider">
             <summary>
             Class ClickatelProvider.
-            Implements the <see cref="T:Cloud.Core.NotificationHub.Providers.ISmsProvider" />
+            Implements the <see cref="T:Cloud.Core.ISmsProvider" />
             </summary>
-            <seealso cref="T:Cloud.Core.NotificationHub.Providers.ISmsProvider" />
+            <seealso cref="T:Cloud.Core.ISmsProvider" />
         </member>
         <member name="P:Cloud.Core.NotificationHub.Providers.Sms.ClickatelProvider.Name">
             <summary>
@@ -541,14 +444,14 @@
             </summary>
             <value>The name.</value>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.ClickatelProvider.Send(Cloud.Core.NotificationHub.Providers.SmsMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.ClickatelProvider.Send(Cloud.Core.SmsMessage)">
             <summary>
             Sends the specified message.
             </summary>
             <param name="sms">The message.</param>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.ClickatelProvider.SendAsync(Cloud.Core.NotificationHub.Providers.SmsMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.ClickatelProvider.SendAsync(Cloud.Core.SmsMessage)">
             <summary>
             Sends the asynchronous.
             </summary>
@@ -559,11 +462,11 @@
             <summary>Gets or sets the name for the implementor of the INamedInstance interface.</summary>
             <value>The name of this instance.</value>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.DummySmsProvider.Send(Cloud.Core.NotificationHub.Providers.SmsMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.DummySmsProvider.Send(Cloud.Core.SmsMessage)">
             <summary>Sends the specified email.</summary>
             <param name="sms">The email to send.</param>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.DummySmsProvider.SendAsync(Cloud.Core.NotificationHub.Providers.SmsMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.DummySmsProvider.SendAsync(Cloud.Core.SmsMessage)">
             <summary>Sends the email asynchronously.</summary>
             <param name="sms">The email to send.</param>
             <returns>Task.</returns>
@@ -572,9 +475,9 @@
         <member name="T:Cloud.Core.NotificationHub.Providers.Sms.SendgridSmsProvider">
             <summary>
             Class SendgridSmsProvider.
-            Implements the <see cref="T:Cloud.Core.NotificationHub.Providers.ISmsProvider" />
+            Implements the <see cref="T:Cloud.Core.ISmsProvider" />
             </summary>
-            <seealso cref="T:Cloud.Core.NotificationHub.Providers.ISmsProvider" />
+            <seealso cref="T:Cloud.Core.ISmsProvider" />
         </member>
         <member name="P:Cloud.Core.NotificationHub.Providers.Sms.SendgridSmsProvider.Name">
             <summary>
@@ -582,14 +485,14 @@
             </summary>
             <value>The name.</value>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.SendgridSmsProvider.Send(Cloud.Core.NotificationHub.Providers.SmsMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.SendgridSmsProvider.Send(Cloud.Core.SmsMessage)">
             <summary>
             Sends the specified message.
             </summary>
             <param name="sms">The message.</param>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.SendgridSmsProvider.SendAsync(Cloud.Core.NotificationHub.Providers.SmsMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.SendgridSmsProvider.SendAsync(Cloud.Core.SmsMessage)">
             <summary>
             Sends the asynchronous.
             </summary>
@@ -600,9 +503,9 @@
         <member name="T:Cloud.Core.NotificationHub.Providers.Sms.TextlocalProvider">
             <summary>
             Class TextlocalProvider.
-            Implements the <see cref="T:Cloud.Core.NotificationHub.Providers.ISmsProvider" />
+            Implements the <see cref="T:Cloud.Core.ISmsProvider" />
             </summary>
-            <seealso cref="T:Cloud.Core.NotificationHub.Providers.ISmsProvider" />
+            <seealso cref="T:Cloud.Core.ISmsProvider" />
         </member>
         <member name="P:Cloud.Core.NotificationHub.Providers.Sms.TextlocalProvider.Name">
             <summary>
@@ -610,14 +513,14 @@
             </summary>
             <value>The name.</value>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.TextlocalProvider.Send(Cloud.Core.NotificationHub.Providers.SmsMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.TextlocalProvider.Send(Cloud.Core.SmsMessage)">
             <summary>
             Sends the specified message.
             </summary>
             <param name="sms">The message.</param>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.TextlocalProvider.SendAsync(Cloud.Core.NotificationHub.Providers.SmsMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.TextlocalProvider.SendAsync(Cloud.Core.SmsMessage)">
             <summary>
             Sends the asynchronous.
             </summary>

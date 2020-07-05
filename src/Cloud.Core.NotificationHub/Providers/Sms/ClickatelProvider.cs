@@ -2,7 +2,6 @@
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Rest.TransientFaultHandling;
 
 namespace Cloud.Core.NotificationHub.Providers.Sms
 {
@@ -38,9 +37,9 @@ namespace Cloud.Core.NotificationHub.Providers.Sms
         /// </summary>
         /// <param name="sms">The message.</param>
         /// <exception cref="System.NotImplementedException"></exception>
-        public void Send(SmsMessage sms)
+        public bool Send(SmsMessage sms)
         {
-            SendAsync(sms).GetAwaiter().GetResult();
+            return SendAsync(sms).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -48,7 +47,7 @@ namespace Cloud.Core.NotificationHub.Providers.Sms
         /// </summary>
         /// <param name="sms">The message.</param>
         /// <returns>Task.</returns>
-        public async Task SendAsync(SmsMessage sms)
+        public async Task<bool> SendAsync(SmsMessage sms)
         {
             var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(new { content = sms.FullContent, to = sms.To.ToArray() });
 
@@ -58,6 +57,8 @@ namespace Cloud.Core.NotificationHub.Providers.Sms
             {
                 throw new InvalidDataException(res.StatusCode.ToString());
             }
+
+            return true;
         }
     }
 }

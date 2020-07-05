@@ -1,6 +1,5 @@
 ﻿using Cloud.Core.Messaging.AzureServiceBus.Models;
 using Cloud.Core.NotificationHub.HostedServices;
-using Cloud.Core.NotificationHub.Extensions;
 using Cloud.Core.NotificationHub.Providers.Email;
 using Cloud.Core.NotificationHub.Providers.Sms;
 using Microsoft.AspNetCore.Builder;

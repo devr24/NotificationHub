@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Cloud.Core.NotificationHub.Providers;
 using Microsoft.AspNetCore.Http;
 
@@ -17,16 +18,17 @@ namespace Cloud.Core.NotificationHub.Models.DTO
 
         public static implicit operator EmailMessage(CreateEmail source)
         {
-            return new EmailMessage
+            var mail = new EmailMessage
             {
                 Content = source.Content,
                 IsPlainText = source.IsPlainText,
-                Links = source.Links,
                 Subject = source.Subject,
-                Attachments = source.Attachments,
-                TemplateName = source.TemplateName,
-                To = source.To
+                TemplateName = source.TemplateName
             };
+            mail.Attachments.AddRange(source.Attachments.Select(a => new EmailAttachment { Name = a.FileName, Content = a.OpenReadStream(), ContentType = a.ContentType }));
+            mail.To.AddRange(source.To.Select(a => new EmailRecipient { Name = a, Address = a}));
+
+            return mail;
         }
     }
 }

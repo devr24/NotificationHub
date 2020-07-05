@@ -29,15 +29,15 @@
 
         /// <summary>Sends the specified email.</summary>
         /// <param name="email">The email to send.</param>
-        public void Send(EmailMessage email)
+        public bool Send(EmailMessage email)
         {
-            SendAsync(email).GetAwaiter().GetResult();
+            return SendAsync(email).GetAwaiter().GetResult();
         }
 
         /// <summary>send as an asynchronous operation.</summary>
         /// <param name="email">The email to send.</param>
         /// <returns>Task.</returns>
-        public async Task SendAsync(EmailMessage email)
+        public async Task<bool> SendAsync(EmailMessage email)
         {
             try
             {
@@ -49,6 +49,8 @@
                 //log an error message or throw an exception, or both.
                 throw;
             }
+
+            return true;
         }
 
         /// <summary>Creates the email message.</summary>
@@ -64,14 +66,14 @@
             };
 
             foreach (var to in message.To)
-                email.Bcc.Add(to);
+                email.Bcc.Add(to.Address);
             
             if (message.Attachments != null && message.Attachments.Any())
             {
                 foreach (var file in message.Attachments)
                 {
                     // Create  the file attachment for this email message.
-                    Attachment data = new Attachment(file.OpenReadStream(), file.ContentType);
+                    Attachment data = new Attachment(file.Content, file.ContentType);
 
                     // Add the file attachment to this email message.
                     email.Attachments.Add(data);

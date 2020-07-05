@@ -16,16 +16,16 @@
         /// <summary>Sends the specified email.</summary>
         /// <param name="email">The email to send.</param>
         /// <exception cref="System.NotImplementedException"></exception>
-        public void Send(EmailMessage email)
+        public bool Send(EmailMessage email)
         {
-            SendAsync(email).GetAwaiter().GetResult();
+            return SendAsync(email).GetAwaiter().GetResult();
         }
 
         /// <summary>Sends the email asynchronously.</summary>
         /// <param name="email">The email to send.</param>
         /// <returns>Task.</returns>
         /// <exception cref="System.NotImplementedException"></exception>
-        public Task SendAsync(EmailMessage email)
+        public Task<bool> SendAsync(EmailMessage email)
         {
             throw new System.NotImplementedException();
         }

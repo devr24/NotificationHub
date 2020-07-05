@@ -91,7 +91,7 @@ namespace Cloud.Core.NotificationHub.HostedServices
 
                     await ((Storage.AzureBlobStorage.BlobStorage)_blobStorage).CopyFile(sourcePath, publicPath);
 
-                    var sasUrl = await _blobStorage.GetSignedBlobAccessUrl(publicPath, new SignedAccessConfig(new System.Collections.Generic.List<AccessPermission> { AccessPermission.Read }));
+                    var sasUrl = await _blobStorage.GetSignedBlobAccessUrl(publicPath, new SignedAccessConfig(new List<AccessPermission> { AccessPermission.Read }));
 
                     using (var client = new HttpClient())
                     {
@@ -100,11 +100,11 @@ namespace Cloud.Core.NotificationHub.HostedServices
                         var res = await client.PostAsync("https://api-ssl.bitly.com/v4/shorten", new StringContent(jsonString, Encoding.UTF8, "application/json"));
                         var content = await res.Content.ReadAsStringAsync();
                         var obj = JsonConvert.DeserializeObject<Bitly>(content);
-                        //sasUrl = obj.link;
+                        sasUrl = obj.link;
                     }
 
-                    sms.Links.Add(new ResourceLink { 
-                        Name = fileName,
+                    sms.Links.Add(new SmsLink { 
+                        Title = fileName,
                         Link = new Uri(sasUrl)
                     });
                     Interlocked.Increment(ref _sasUrlsGenerated);

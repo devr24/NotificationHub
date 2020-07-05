@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cloud.Core.NotificationHub.Models.DTO;
 using Cloud.Core.NotificationHub.Providers;
 
@@ -44,15 +45,15 @@ namespace Cloud.Core.NotificationHub.Models.Events
 
         public static implicit operator EmailMessage(EmailEvent source)
         {
-            return new EmailMessage
+            var email = new EmailMessage
             {
                 Content = source.Content,
                 IsPlainText = source.IsPlainText,
-                Links = source.Links,
                 Subject = source.Subject,
-                TemplateName = source.TemplateName,
-                To = source.To
+                TemplateName = source.TemplateName
             };
+            email.To.AddRange(source.To.Select(t => new EmailRecipient { Name = t, Address = t }));
+            return email;
         }
     }
 }

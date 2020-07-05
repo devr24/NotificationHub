@@ -21,9 +21,9 @@ namespace Cloud.Core.NotificationHub.Providers.Sms
         /// </summary>
         /// <param name="sms">The message.</param>
         /// <exception cref="System.NotImplementedException"></exception>
-        public void Send(SmsMessage sms)
+        public bool Send(SmsMessage sms)
         {
-            SendAsync(sms).GetAwaiter().GetResult();
+            return SendAsync(sms).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace Cloud.Core.NotificationHub.Providers.Sms
         /// <param name="sms">The message.</param>
         /// <returns>Task.</returns>
         /// <exception cref="System.NotImplementedException"></exception>
-        public Task SendAsync(SmsMessage sms)
+        public Task<bool> SendAsync(SmsMessage sms)
         {
             throw new System.NotImplementedException();
         }

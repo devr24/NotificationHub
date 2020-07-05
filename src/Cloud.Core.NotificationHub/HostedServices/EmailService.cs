@@ -78,7 +78,7 @@ namespace Cloud.Core.NotificationHub.HostedServices
                     var path = $"{_settings.AttachmentContainerName}/{attachmentId}";
                     var blobData = await _blobStorage.GetBlob(path, true);
                     
-                    email.Attachments.Add(new FormFile(await _blobStorage.DownloadBlob(path), 0, blobData.FileSize, blobData.Metadata["name"], blobData.Metadata["name"] ));
+                    email.Attachments.Add(new EmailAttachment { Content = await _blobStorage.DownloadBlob(path), Name = blobData.Metadata["name"], ContentType = blobData.Metadata["type"] });
                 }
 
                 await emailProvider.SendAsync(email);

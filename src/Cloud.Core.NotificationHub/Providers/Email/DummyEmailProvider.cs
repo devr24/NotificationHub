@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace Cloud.Core.NotificationHub.Providers.Email
@@ -19,20 +20,20 @@ namespace Cloud.Core.NotificationHub.Providers.Email
         /// <summary>Sends the specified email.</summary>
         /// <param name="email">The email to send.</param>
         /// <exception cref="System.NotImplementedException"></exception>
-        public void Send(EmailMessage email)
+        public bool Send(EmailMessage email)
         {
-            SendAsync(email).GetAwaiter().GetResult();
+            return SendAsync(email).GetAwaiter().GetResult();
         }
 
         /// <summary>Sends the email asynchronously.</summary>
         /// <param name="email">The email to send.</param>
         /// <returns>Task.</returns>
         /// <exception cref="System.NotImplementedException"></exception>
-        public Task SendAsync(EmailMessage email)
+        public Task<bool> SendAsync(EmailMessage email)
         {
-            _logger.LogInformation($"Email sent successfully, TO: {string.Join(",", email.To)}, CONTENT: {email.FullContent}, TEMPLATE: {email.TemplateName}");
+            _logger.LogInformation($"Email sent successfully, TO: {string.Join(",", email.To.Select(t => t.Address))}, CONTENT: {email.Content}, TEMPLATE: {email.TemplateName}");
 
-            return Task.FromResult(email);
+            return Task.FromResult(true);
         }
     }
 }

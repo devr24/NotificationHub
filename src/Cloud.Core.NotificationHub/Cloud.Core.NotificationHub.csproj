@@ -15,10 +15,11 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Cloud.Core" Version="3.1.3589.578" />
+    <PackageReference Include="Cloud.Core" Version="3.1.3592.593" />
     <PackageReference Include="Cloud.Core.Extensions.Configuration" Version="3.1.3530.481" />
     <PackageReference Include="Cloud.Core.Messaging.AzureServiceBus" Version="3.1.3530.492" />
     <PackageReference Include="Cloud.Core.SecureVault.AzureKeyVault" Version="3.1.3530.487" />
+    <PackageReference Include="Cloud.Core.Storage.AzureBlobStorage" Version="3.1.3590.585" />
     <PackageReference Include="Cloud.Core.Telemetry.AzureAppInsights" Version="3.1.3530.488" />
     <PackageReference Include="Cloud.Core.Web" Version="3.1.3589.564" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.1.1" />
@@ -47,10 +48,6 @@
 
   <ItemGroup>
     <Folder Include="Properties\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Cloud.Core.Storage.AzureBlobStorage\src\Cloud.Core.Storage.AzureBlobStorage\Cloud.Core.Storage.AzureBlobStorage.csproj" />
   </ItemGroup>
 
   <ItemGroup>

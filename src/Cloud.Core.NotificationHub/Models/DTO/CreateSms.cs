@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Cloud.Core.NotificationHub.Providers;
 using Microsoft.AspNetCore.Http;
 
@@ -21,12 +22,15 @@ namespace Cloud.Core.NotificationHub.Models.DTO
 
         public static implicit operator SmsMessage(CreateSms source)
         {
-            return new SmsMessage
+            var sms = new SmsMessage
             {
                 Text = source.Text,
-                Links = source.Links,
                 To = source.To
             };
+
+            sms.Links.AddRange(source.Links.Select(l => new SmsLink { Title = l.Name, Link = l.Link }));
+
+            return sms;
         }
     }
 }
