@@ -50,6 +50,11 @@ namespace Cloud.Core.NotificationHub.Controllers
         [RequestFormLimits(MultipartBodyLengthLimit = AppSettings.RequestSizeBytesLimit)] // 5mb limit
         public async Task<IActionResult> CreateSms([FromForm] CreateSms sms)
         {
+            if (!_smsProviders.GetInstanceNames().Contains(sms.Provider.Value.ToString()))
+            {
+                ModelState.AddModelError("Provider", $"{sms.Provider.Value} has no implementation");
+            }
+
             // TODO: REPLACE WITH FLUENT VALIDATION AND CREATE SMS VALIDATOR.
             // If the model state is invalid (i.e. required fields are missing), then return bad request.
             if (!ModelState.IsValid)
@@ -89,6 +94,11 @@ namespace Cloud.Core.NotificationHub.Controllers
         [RequestFormLimits(MultipartBodyLengthLimit = AppSettings.RequestSizeBytesLimit)] // 5mb limit
         public async Task<IActionResult> CreateSmsAsync([FromBody] CreateSmsEvent sms)
         {
+            if (!_smsProviders.GetInstanceNames().Contains(sms.Provider.Value.ToString()))
+            {
+                ModelState.AddModelError("Provider", $"{sms.Provider.Value} has no implementation");
+            }
+
             // TODO: REPLACE WITH FLUENT VALIDATION AND CREATE SMS VALIDATOR.
             // If the model state is invalid (i.e. required fields are missing), then return bad request.
             if (!ModelState.IsValid)

@@ -364,167 +364,32 @@
         <member name="M:Cloud.Core.NotificationHub.Program.Main(System.String[])">
             <summary>Defines the entry point of the application.</summary>
         </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.Email.DummyEmailProvider.Name">
+        <member name="P:Cloud.Core.NotificationHub.Providers.DummyEmailProvider.Name">
             <summary>Gets or sets the name for the implementor of the INamedInstance interface.</summary>
             <value>The name of this instance.</value>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.DummyEmailProvider.Send(Cloud.Core.EmailMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.DummyEmailProvider.Send(Cloud.Core.EmailMessage)">
             <summary>Sends the specified email.</summary>
             <param name="email">The email to send.</param>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.DummyEmailProvider.SendAsync(Cloud.Core.EmailMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.DummyEmailProvider.SendAsync(Cloud.Core.EmailMessage)">
             <summary>Sends the email asynchronously.</summary>
             <param name="email">The email to send.</param>
             <returns>Task.</returns>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
-        <member name="T:Cloud.Core.NotificationHub.Providers.Email.SendgridProvider">
-            <summary>
-            Class Sendgrid email provider.
-            Implements the <see cref="T:Cloud.Core.IEmailProvider" />
-            </summary>
-            <seealso cref="T:Cloud.Core.IEmailProvider" />
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.Email.SendgridProvider.Name">
+        <member name="P:Cloud.Core.NotificationHub.Providers.DummySmsProvider.Name">
             <summary>Gets or sets the name for the implementor of the INamedInstance interface.</summary>
             <value>The name of this instance.</value>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SendgridProvider.Send(Cloud.Core.EmailMessage)">
-            <summary>Sends the specified email.</summary>
-            <param name="email">The email to send.</param>
-            <exception cref="T:System.NotImplementedException"></exception>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SendgridProvider.SendAsync(Cloud.Core.EmailMessage)">
-            <summary>Sends the email asynchronously.</summary>
-            <param name="email">The email to send.</param>
-            <returns>Task.</returns>
-            <exception cref="T:System.NotImplementedException"></exception>
-        </member>
-        <member name="T:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider">
-            <summary>
-            Class Smtp email provider.
-            Implements the <see cref="T:Cloud.Core.IEmailProvider" />
-            </summary>
-            <seealso cref="T:Cloud.Core.IEmailProvider" />
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.Name">
-            <summary>Gets or sets the name for the implementor of the INamedInstance interface.</summary>
-            <value>The name of this instance.</value>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.#ctor(System.Net.Mail.SmtpClient,Cloud.Core.NotificationHub.AppSettings)">
-            <summary>Initializes a new instance of the <see cref="T:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider" /> class.</summary>
-            <param name="smtpClient">The configuration.</param>
-            <param name="settings">The settings.</param>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.Send(Cloud.Core.EmailMessage)">
-            <summary>Sends the specified email.</summary>
-            <param name="email">The email to send.</param>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.SendAsync(Cloud.Core.EmailMessage)">
-            <summary>send as an asynchronous operation.</summary>
-            <param name="email">The email to send.</param>
-            <returns>Task.</returns>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Email.SmtpProvider.CreateEmailMessage(Cloud.Core.EmailMessage)">
-            <summary>Creates the email message.</summary>
-            <param name="message">The message.</param>
-            <returns>System.Net.Mail.MailMessage.</returns>
-        </member>
-        <member name="T:Cloud.Core.NotificationHub.Providers.Sms.ClickatelProvider">
-            <summary>
-            Class ClickatelProvider.
-            Implements the <see cref="T:Cloud.Core.ISmsProvider" />
-            </summary>
-            <seealso cref="T:Cloud.Core.ISmsProvider" />
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.Sms.ClickatelProvider.Name">
-            <summary>
-            Gets or sets the name for the implementor of the INamedInstance interface.
-            </summary>
-            <value>The name.</value>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.ClickatelProvider.Send(Cloud.Core.SmsMessage)">
-            <summary>
-            Sends the specified message.
-            </summary>
-            <param name="sms">The message.</param>
-            <exception cref="T:System.NotImplementedException"></exception>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.ClickatelProvider.SendAsync(Cloud.Core.SmsMessage)">
-            <summary>
-            Sends the asynchronous.
-            </summary>
-            <param name="sms">The message.</param>
-            <returns>Task.</returns>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.Sms.DummySmsProvider.Name">
-            <summary>Gets or sets the name for the implementor of the INamedInstance interface.</summary>
-            <value>The name of this instance.</value>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.DummySmsProvider.Send(Cloud.Core.SmsMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.DummySmsProvider.Send(Cloud.Core.SmsMessage)">
             <summary>Sends the specified email.</summary>
             <param name="sms">The email to send.</param>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.DummySmsProvider.SendAsync(Cloud.Core.SmsMessage)">
+        <member name="M:Cloud.Core.NotificationHub.Providers.DummySmsProvider.SendAsync(Cloud.Core.SmsMessage)">
             <summary>Sends the email asynchronously.</summary>
             <param name="sms">The email to send.</param>
-            <returns>Task.</returns>
-            <exception cref="T:System.NotImplementedException"></exception>
-        </member>
-        <member name="T:Cloud.Core.NotificationHub.Providers.Sms.SendgridSmsProvider">
-            <summary>
-            Class SendgridSmsProvider.
-            Implements the <see cref="T:Cloud.Core.ISmsProvider" />
-            </summary>
-            <seealso cref="T:Cloud.Core.ISmsProvider" />
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.Sms.SendgridSmsProvider.Name">
-            <summary>
-            Gets or sets the name for the implementor of the INamedInstance interface.
-            </summary>
-            <value>The name.</value>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.SendgridSmsProvider.Send(Cloud.Core.SmsMessage)">
-            <summary>
-            Sends the specified message.
-            </summary>
-            <param name="sms">The message.</param>
-            <exception cref="T:System.NotImplementedException"></exception>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.SendgridSmsProvider.SendAsync(Cloud.Core.SmsMessage)">
-            <summary>
-            Sends the asynchronous.
-            </summary>
-            <param name="sms">The message.</param>
-            <returns>Task.</returns>
-            <exception cref="T:System.NotImplementedException"></exception>
-        </member>
-        <member name="T:Cloud.Core.NotificationHub.Providers.Sms.TextlocalProvider">
-            <summary>
-            Class TextlocalProvider.
-            Implements the <see cref="T:Cloud.Core.ISmsProvider" />
-            </summary>
-            <seealso cref="T:Cloud.Core.ISmsProvider" />
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.Sms.TextlocalProvider.Name">
-            <summary>
-            Gets or sets the name for the implementor of the INamedInstance interface.
-            </summary>
-            <value>The name.</value>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.TextlocalProvider.Send(Cloud.Core.SmsMessage)">
-            <summary>
-            Sends the specified message.
-            </summary>
-            <param name="sms">The message.</param>
-            <exception cref="T:System.NotImplementedException"></exception>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.Sms.TextlocalProvider.SendAsync(Cloud.Core.SmsMessage)">
-            <summary>
-            Sends the asynchronous.
-            </summary>
-            <param name="sms">The message.</param>
             <returns>Task.</returns>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>

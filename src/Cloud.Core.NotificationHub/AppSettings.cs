@@ -47,11 +47,5 @@ namespace Cloud.Core.NotificationHub
                 AllowedAttachmentTypesList = value.IsNullOrDefault() ? new List<string>() : value.Split(',').ToList();
             }
         }
-
-        public bool IsSmtpConfigured => !SmtpServer.IsNullOrDefault() && !SmtpPort.IsNullOrDefault();
-        public string SmtpServer { get; set; }
-        public string SmtpPort { get; set; }
-        public string SmtpUsername { get; set; }
-        public string SmtpPassword { get; set; }
     }
 }

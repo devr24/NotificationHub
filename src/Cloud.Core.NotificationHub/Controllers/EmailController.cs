@@ -50,6 +50,11 @@ namespace Cloud.Core.NotificationHub.Controllers
         [RequestFormLimits(MultipartBodyLengthLimit = AppSettings.RequestSizeBytesLimit)] // 5mb limit
         public async Task<IActionResult> CreateEmail([FromForm] CreateEmail email)
         {
+            if (!_emailProviders.GetInstanceNames().Contains(email.Provider.Value.ToString()))
+            {
+                ModelState.AddModelError("Provider", $"{email.Provider.Value} has no implementation");
+            }
+
             // TODO: REPLACE WITH FLUENT VALIDATION AND CREATE EMAIL VALIDATOR.
             // If the model state is invalid (i.e. required fields are missing), then return bad request.
             if (!ModelState.IsValid)
@@ -89,6 +94,11 @@ namespace Cloud.Core.NotificationHub.Controllers
         [RequestFormLimits(MultipartBodyLengthLimit = AppSettings.RequestSizeBytesLimit)] // 5mb limit
         public async Task<IActionResult> CreateEmailAsync([FromBody] CreateEmailEvent email)
         {
+            if (!_emailProviders.GetInstanceNames().Contains(email.Provider.Value.ToString()))
+            {
+                ModelState.AddModelError("Provider", $"{email.Provider.Value} has no implementation");
+            }
+
             // TODO: REPLACE WITH FLUENT VALIDATION AND CREATE EMAIL EVENT VALIDATOR.
             // If the model state is invalid (i.e. required fields are missing), then return bad request.
             if (!ModelState.IsValid)

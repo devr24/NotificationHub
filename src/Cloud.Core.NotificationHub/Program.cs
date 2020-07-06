@@ -45,7 +45,8 @@ namespace Cloud.Core.NotificationHub
                         "SmtpServer",
                         "SmtpPort",
                         "SmtpUsername",
-                        "SmtpPassword");
+                        "SmtpPassword",
+                        "ClickatelApiKey");
                 })
                 .ConfigureLogging((context, logging) => {
                     

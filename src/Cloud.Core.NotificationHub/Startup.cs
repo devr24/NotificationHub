@@ -1,7 +1,5 @@
 ﻿using Cloud.Core.Messaging.AzureServiceBus.Models;
 using Cloud.Core.NotificationHub.HostedServices;
-using Cloud.Core.NotificationHub.Providers.Email;
-using Cloud.Core.NotificationHub.Providers.Sms;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -13,8 +11,9 @@ using blobConfig = Cloud.Core.Storage.AzureBlobStorage.Config;
 using sbConfig = Cloud.Core.Messaging.AzureServiceBus.Config;
 using System.Text.Json.Serialization;
 using Cloud.Core.Services;
-using System.Net.Mail;
-using System.Net;
+using Cloud.Core.Notification.Smtp;
+using Cloud.Core.Notification.Clickatel;
+using Cloud.Core.NotificationHub.Providers;
 
 namespace Cloud.Core.NotificationHub
 {
@@ -106,29 +105,38 @@ namespace Cloud.Core.NotificationHub
             services.AddHostedService<SmsService>();
 
             // Add email providers.
-         
-            if (_appSettings.IsSmtpConfigured) 
-            { 
-                services.AddSingleton(new SmtpClient(_configuration["SmtpServer"], _configuration.GetValue<int>("SmtpPort"))
-                {
-                    UseDefaultCredentials = false,
-                    Credentials = new NetworkCredential(_configuration["SmtpUsername"], _configuration["SmtpPassword"])
-                });
-                services.AddEmailProvider<SmtpProvider>();
-            }
-            services.AddEmailProvider<SendgridProvider>()
+            services.AddSingleton(new SmtpConfig { 
+                SmtpServer = _configuration["SmtpServer"],
+                SmtpPort = _configuration.GetValue<int>("SmtpPort"),
+                SmtpUsername = _configuration["SmtpUsername"],
+                SmtpPassword = _configuration["SmtpPassword"]
+            });
+            services.AddEmailProvider<SmtpProvider>()
                     .AddEmailProvider<DummyEmailProvider>();
 
             // Add sms providers.
+            services.AddSingleton(new ClickatelConfig { 
+                ApiAuthorisationKey = _configuration["ClickatelApiKey"]
+            });
             services.AddSmsProvider<ClickatelProvider>()
-                    .AddSmsProvider<SendgridSmsProvider>()
-                    .AddSmsProvider<TextlocalProvider>()
                     .AddSmsProvider<DummySmsProvider>();
 
             // Add Mvc 
             services.AddHealthChecks();
             services.AddControllers();
-            services.AddSwaggerWithVersions(_appVersions, c => c.IncludeXmlComments("Cloud.Core.NotificationHub.xml"));
+            services.AddSwaggerWithVersions(_appVersions, c => { 
+                c.IncludeXmlComments("Cloud.Core.NotificationHub.xml");
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { 
+                    Version  = "v1",
+                    Title = "Notification Hub API",
+                    Description = "This documentation describes the endpoints available for the Notification Hub API",
+                    Contact = new Microsoft.OpenApi.Models.OpenApiContact
+                    {
+                        Email = "robert.mccabe@outlook.com",
+                        Name = "Robert McCabe"
+                    }
+                });
+            });
             services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
             services.AddRouting(options => options.LowercaseUrls = true);
             services.AddMvc().AddJsonOptions(options => { 
