@@ -15,15 +15,15 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Cloud.Core" Version="3.1.3592.599" />
-    <PackageReference Include="Cloud.Core.Extensions.Configuration" Version="3.1.3530.481" />
-    <PackageReference Include="Cloud.Core.Messaging.AzureServiceBus" Version="3.1.3593.604" />
-    <PackageReference Include="Cloud.Core.Notification.Clickatel" Version="3.1.3593.611" />
-    <PackageReference Include="Cloud.Core.Notification.Smtp" Version="3.1.3593.603" />
-    <PackageReference Include="Cloud.Core.SecureVault.AzureKeyVault" Version="3.1.3593.605" />
-    <PackageReference Include="Cloud.Core.Storage.AzureBlobStorage" Version="3.1.3593.606" />
-    <PackageReference Include="Cloud.Core.Telemetry.AzureAppInsights" Version="3.1.3593.609" />
-    <PackageReference Include="Cloud.Core.Web" Version="3.1.3593.610" />
+    <PackageReference Include="Cloud.Core" Version="3.1.3593.616" />
+    <PackageReference Include="Cloud.Core.Extensions.Configuration" Version="3.1.3593.622" />
+    <PackageReference Include="Cloud.Core.Messaging.AzureServiceBus" Version="3.1.3593.631" />
+    <PackageReference Include="Cloud.Core.Notification.Clickatel" Version="3.1.3593.648" />
+    <PackageReference Include="Cloud.Core.Notification.Smtp" Version="3.1.3593.645" />
+    <PackageReference Include="Cloud.Core.SecureVault.AzureKeyVault" Version="3.1.3593.626" />
+    <PackageReference Include="Cloud.Core.Storage.AzureBlobStorage" Version="3.1.3593.650" />
+    <PackageReference Include="Cloud.Core.Telemetry.AzureAppInsights" Version="3.1.3593.627" />
+    <PackageReference Include="Cloud.Core.Web" Version="3.1.3593.618" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.3" />

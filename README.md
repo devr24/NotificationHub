@@ -62,3 +62,8 @@ The proof of concept will only implement the Sendgrid email provider, to prove t
 The following roadmap will show the plan for continued development of the notification hub. There are no timelines associated with this as I have no clear indiciation of how important this work is, stacked up against other work that’s going on.
 
 ![Notification Hub](content/timeline.png)
+
+
+<a href="https://dev.azure.com/cloudcoreproject/CloudCore" target="_blank">
+<img src="https://cloud1core.blob.core.windows.net/icons/cloud_core_small.PNG" />
+</a>

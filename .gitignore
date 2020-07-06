@@ -252,3 +252,9 @@ paket-files/
 *.sln.iml
 /src/Tests/coverage.json
 /src/Tests/coverage.opencover.xml
+
+# docfx - Api documentation
+docfx_project/
+/logo.svg
+/favicon.ico
+
