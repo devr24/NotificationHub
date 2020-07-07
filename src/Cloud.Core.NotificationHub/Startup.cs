@@ -1,5 +1,11 @@
-﻿using Cloud.Core.Messaging.AzureServiceBus.Models;
+﻿using System.Text.Json.Serialization;
+using Cloud.Core.Messaging.AzureServiceBus.Models;
+using Cloud.Core.Notification.Clickatel;
+using Cloud.Core.Notification.Smtp;
+using Cloud.Core.Notification.Textlocal;
 using Cloud.Core.NotificationHub.HostedServices;
+using Cloud.Core.NotificationHub.Providers;
+using Cloud.Core.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -7,13 +13,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using blobConfig = Cloud.Core.Storage.AzureBlobStorage.Config;
 using sbConfig = Cloud.Core.Messaging.AzureServiceBus.Config;
-using System.Text.Json.Serialization;
-using Cloud.Core.Services;
-using Cloud.Core.Notification.Smtp;
-using Cloud.Core.Notification.Clickatel;
-using Cloud.Core.NotificationHub.Providers;
 
 namespace Cloud.Core.NotificationHub
 {
@@ -22,7 +24,7 @@ namespace Cloud.Core.NotificationHub
     {
         private readonly ILogger<Startup> _logger;
         private readonly IConfiguration _configuration;
-        private readonly double[] _appVersions = { 1.0, 2.0 };
+        private readonly double[] _appVersions = { 1.0 };
         private AppSettings _appSettings;
 
         /// <summary>
@@ -100,7 +102,7 @@ namespace Cloud.Core.NotificationHub
             });
 
             services.AddSingleton(new MonitorService(_appSettings.MonitorFrequencySeconds));
-
+            services.AddSingleton<IUrlShortener>(new BitlyUrlService(new BitlyConfig { ApiKey = _configuration["BitlyApiKey"] }));
             services.AddHostedService<EmailService>();
             services.AddHostedService<SmsService>();
 
@@ -118,7 +120,11 @@ namespace Cloud.Core.NotificationHub
             services.AddSingleton(new ClickatelConfig { 
                 ApiAuthorisationKey = _configuration["ClickatelApiKey"]
             });
+            services.AddSingleton(new TextlocalConfig { 
+                ApiAuthorisationKey = _configuration["TextlocalApiKey"] 
+            });
             services.AddSmsProvider<ClickatelProvider>()
+                    .AddSmsProvider<TextlocalProvider>()
                     .AddSmsProvider<DummySmsProvider>();
 
             // Add Mvc 
@@ -126,16 +132,18 @@ namespace Cloud.Core.NotificationHub
             services.AddControllers();
             services.AddSwaggerWithVersions(_appVersions, c => { 
                 c.IncludeXmlComments("Cloud.Core.NotificationHub.xml");
-                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { 
-                    Version  = "v1",
-                    Title = "Notification Hub API",
-                    Description = "This documentation describes the endpoints available for the Notification Hub API",
-                    Contact = new Microsoft.OpenApi.Models.OpenApiContact
-                    {
-                        Email = "robert.mccabe@outlook.com",
-                        Name = "Robert McCabe"
-                    }
-                });
+                //c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { 
+                //    Version  = "v1",
+                //    Title = "Notification Hub API",
+                //    Description = "This documentation describes the endpoints available for the Notification Hub API",
+                //    Contact = new Microsoft.OpenApi.Models.OpenApiContact
+                //    {
+                //        Email = "robert.mccabe@outlook.com",
+                //        Name = "Robert McCabe"
+                //    }
+                //});
+
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Notification Hub API", Version = "v1" });
             });
             services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
             services.AddRouting(options => options.LowercaseUrls = true);

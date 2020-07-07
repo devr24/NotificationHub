@@ -20,7 +20,7 @@
         SendgridProvider = 2,
         /// <summary>Textlocal provider.</summary>
         TextlocalProvider = 3,
-
+        /// <summary>Dummy sms provider for testing.</summary>
         DummySmsProvider = 4
     }
 }

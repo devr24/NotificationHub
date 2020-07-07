@@ -1,16 +1,13 @@
-﻿using Cloud.Core;
-using Cloud.Core.NotificationHub.Models.Events;
-using Cloud.Core.NotificationHub.Providers;
-using Cloud.Core.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Cloud.Core.NotificationHub.HostedServices
+﻿namespace Cloud.Core.NotificationHub.HostedServices
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Cloud.Core.Notification.Events;
+    using Cloud.Core.Services;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
+
     /// <summary>
     /// Class EmailService.
     /// Implements the <see cref="IHostedService" />
@@ -25,6 +22,8 @@ namespace Cloud.Core.NotificationHub.HostedServices
         private readonly AppSettings _settings;
         private readonly NamedInstanceFactory<IEmailProvider> _emailProviders;
         private int _messagesProcessed = 0;
+        private int _messageAttachments = 0;
+        private const string DefaultContentType = "application/octet-stream";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EmailService" /> class.
@@ -54,12 +53,13 @@ namespace Cloud.Core.NotificationHub.HostedServices
         /// <param name="elapsed">The elapsed.</param>
         public void LogBackgroundMetric(TimeSpan elapsed)
         {
-            _logger.LogInformation($"Processed {_messagesProcessed} messages");
+            _logger.LogInformation($"Processed {_messagesProcessed} messages and {_messageAttachments} attachments");
 
             // Customise your statistics logging here.
             _telemetryLogger.LogMetric("Messages Processed", _messagesProcessed);
 
             Interlocked.Exchange(ref _messagesProcessed, 0);
+            Interlocked.Exchange(ref _messageAttachments, 0);
         }
 
         /// <summary>start as an asynchronous operation.</summary>
@@ -67,24 +67,48 @@ namespace Cloud.Core.NotificationHub.HostedServices
         public Task StartAsync(CancellationToken cancellationToken)
         {
             // Start reading messages from Service Bus.
-            _messenger.StartReceive<EmailEvent>(1).Subscribe(async message => {
+            _messenger.StartReceive<EmailEvent>(1).Subscribe(async message => 
+            {
+                // Default the provider if not set.
+                if (message.Provider.IsNullOrEmpty())
+                    message.Provider = _settings.DefaultEmailProvider;
+
+                // Ensure the provider exists.
+                if (!_emailProviders.GetInstanceNames().Contains(message.Provider))
+                {
+                    _logger.LogWarning($"{message.Provider} has no implementation, erroring message");
+                    await _messenger.Error(message, $"{message.Provider} has no implementation");
+                }
 
                 var emailProvider = _emailProviders[message.Provider.ToString()];
 
                 EmailMessage email = message;
 
-                foreach (var attachmentId in message.AttachmentIds)
+                if (message.AttachmentIds != null)
                 {
-                    var path = $"{_settings.AttachmentContainerName}/{attachmentId}";
-                    var blobData = await _blobStorage.GetBlob(path, true);
-                    
-                    email.Attachments.Add(new EmailAttachment { Content = await _blobStorage.DownloadBlob(path), Name = blobData.Metadata["name"], ContentType = blobData.Metadata["type"] });
+                    foreach (var attachmentId in message.AttachmentIds)
+                    {
+                        var path = $"{_settings.AttachmentContainerName}/{attachmentId}";
+                        var blobData = await _blobStorage.GetBlob(path, true);
+
+                        if (!blobData.Metadata.TryGetValue("type", out var contentType))
+                        {
+                            contentType = DefaultContentType;
+                        }
+
+                        email.Attachments.Add(new EmailAttachment { Content = await _blobStorage.DownloadBlob(path), Name = blobData.Metadata["name"], ContentType = contentType });
+
+                        Interlocked.Increment(ref _messageAttachments);
+                    }
                 }
 
-                await emailProvider.SendAsync(email);
+                // Send the mail.
+                var result = await emailProvider.SendAsync(email);
 
                 // When finished, complete the message.
                 await _messenger.Complete(message);
+
+                _logger.LogDebug($"Email {(result ? "sent successfully" : "failed to send")} to {email.To.Count} recipients, subject: {email.Subject}");
 
                 Interlocked.Increment(ref _messagesProcessed);
             });

@@ -46,6 +46,8 @@ namespace Cloud.Core.NotificationHub
                         "SmtpPort",
                         "SmtpUsername",
                         "SmtpPassword",
+                        "BitlyApiKey",
+                        "TextlocalApiKey",
                         "ClickatelApiKey");
                 })
                 .ConfigureLogging((context, logging) => {

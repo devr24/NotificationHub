@@ -56,7 +56,12 @@ namespace Cloud.Core.NotificationHub.Controllers
             var blobData = await _blobStorage.GetBlob(filePath, true);
             var fileName = blobData.Metadata["name"];
 
-            return new FileStreamResult(await _blobStorage.DownloadBlob(filePath), mimeType) 
+            if (!blobData.Metadata.TryGetValue("type", out var contentType))
+            {
+                contentType = mimeType;
+            }
+
+            return new FileStreamResult(await _blobStorage.DownloadBlob(filePath), contentType) 
             { 
                 FileDownloadName = fileName 
             };
@@ -94,7 +99,8 @@ namespace Cloud.Core.NotificationHub.Controllers
             using var uploadStream = attachment.OpenReadStream();
             await _blobStorage.UploadBlob(filePath, uploadStream, new Dictionary<string, string> {
                 { "name", attachment.FileName },
-                { "id", id.ToString() }
+                { "id", id.ToString() },
+                { "type", attachment.ContentType }
             });
             uploadStream.Dispose();
 

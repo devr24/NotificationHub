@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Cloud.Core.Notification.Events;
 using Cloud.Core.NotificationHub.Models.DTO;
-using Cloud.Core.NotificationHub.Models.Events;
-using Cloud.Core.NotificationHub.Providers;
 using Cloud.Core.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -50,16 +49,16 @@ namespace Cloud.Core.NotificationHub.Controllers
         [RequestFormLimits(MultipartBodyLengthLimit = AppSettings.RequestSizeBytesLimit)] // 5mb limit
         public async Task<IActionResult> CreateSms([FromForm] CreateSms sms)
         {
-            if (!_smsProviders.GetInstanceNames().Contains(sms.Provider.Value.ToString()))
-            {
-                ModelState.AddModelError("Provider", $"{sms.Provider.Value} has no implementation");
-            }
-
             // TODO: REPLACE WITH FLUENT VALIDATION AND CREATE SMS VALIDATOR.
             // If the model state is invalid (i.e. required fields are missing), then return bad request.
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ApiErrorResult(ModelState));
+            }
+
+            if (!_smsProviders.GetInstanceNames().Contains(sms.Provider.Value.ToString()))
+            {
+                ModelState.AddModelError("Provider", $"{sms.Provider.Value} has no implementation");
             }
 
             // Validate the attachments, if invalid type or exceeds max allowed size.
@@ -92,18 +91,18 @@ namespace Cloud.Core.NotificationHub.Controllers
         [SwaggerResponse(202, "Sms queued for delivery")]
         [SwaggerResponse(400, "Invalid create sms request", typeof(ApiErrorResult))]
         [RequestFormLimits(MultipartBodyLengthLimit = AppSettings.RequestSizeBytesLimit)] // 5mb limit
-        public async Task<IActionResult> CreateSmsAsync([FromBody] CreateSmsEvent sms)
+        public async Task<IActionResult> CreateSmsAsync([FromBody] SmsEvent sms)
         {
-            if (!_smsProviders.GetInstanceNames().Contains(sms.Provider.Value.ToString()))
-            {
-                ModelState.AddModelError("Provider", $"{sms.Provider.Value} has no implementation");
-            }
-
             // TODO: REPLACE WITH FLUENT VALIDATION AND CREATE SMS VALIDATOR.
             // If the model state is invalid (i.e. required fields are missing), then return bad request.
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ApiErrorResult(ModelState));
+            }
+
+            if (!_smsProviders.GetInstanceNames().Contains(sms.SmsProvider))
+            {
+                ModelState.AddModelError("Provider", $"{sms.SmsProvider} has no implementation");
             }
 
             foreach (var attId in sms.AttachmentIds)

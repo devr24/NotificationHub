@@ -80,7 +80,7 @@
             <param name="email">The email to send.</param>
             <returns>Async Task IActionResult.</returns>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.EmailController.CreateEmailAsync(Cloud.Core.NotificationHub.Models.DTO.CreateEmailEvent)">
+        <member name="M:Cloud.Core.NotificationHub.Controllers.EmailController.CreateEmailAsync(Cloud.Core.Notification.Events.EmailEvent)">
             <summary>Send an email with attachments sychronously.</summary>
             <param name="email">The email to queue for sending.</param>
             <returns>Async Task IActionResult.</returns>
@@ -135,7 +135,7 @@
             <param name="sms">The sms to send.</param>
             <returns>Async Task IActionResult.</returns>
         </member>
-        <member name="M:Cloud.Core.NotificationHub.Controllers.SmsController.CreateSmsAsync(Cloud.Core.NotificationHub.Models.DTO.CreateSmsEvent)">
+        <member name="M:Cloud.Core.NotificationHub.Controllers.SmsController.CreateSmsAsync(Cloud.Core.Notification.Events.SmsEvent)">
             <summary>Send an sms with attachments sychronously.</summary>
             <param name="sms">The sms to queue for sending.</param>
             <returns>Async Task IActionResult.</returns>
@@ -179,7 +179,7 @@
             </summary>
             <seealso cref="T:Microsoft.Extensions.Hosting.IHostedService" />
         </member>
-        <member name="M:Cloud.Core.NotificationHub.HostedServices.SmsService.#ctor(Cloud.Core.NamedInstanceFactory{Cloud.Core.ISmsProvider},Cloud.Core.NamedInstanceFactory{Cloud.Core.IReactiveMessenger},Cloud.Core.ITelemetryLogger,Microsoft.Extensions.Logging.ILogger{Cloud.Core.NotificationHub.HostedServices.SmsService},Cloud.Core.Services.MonitorService,Cloud.Core.IBlobStorage,Cloud.Core.NotificationHub.AppSettings)">
+        <member name="M:Cloud.Core.NotificationHub.HostedServices.SmsService.#ctor(Cloud.Core.NamedInstanceFactory{Cloud.Core.ISmsProvider},Cloud.Core.NamedInstanceFactory{Cloud.Core.IReactiveMessenger},Cloud.Core.ITelemetryLogger,Microsoft.Extensions.Logging.ILogger{Cloud.Core.NotificationHub.HostedServices.SmsService},Cloud.Core.Services.MonitorService,Cloud.Core.IBlobStorage,Cloud.Core.NotificationHub.AppSettings,Cloud.Core.IUrlShortener)">
             <summary>
             Initializes a new instance of the <see cref="T:Cloud.Core.NotificationHub.HostedServices.SmsService" /> class.
             </summary>
@@ -190,6 +190,7 @@
             <param name="monitor">The monitor.</param>
             <param name="blobStorage">The BLOB storage.</param>
             <param name="settings">The settings.</param>
+            <param name="urlShortener">The URL shortener.</param>
         </member>
         <member name="M:Cloud.Core.NotificationHub.HostedServices.SmsService.LogBackgroundMetric(System.TimeSpan)">
             <summary>Logs the background metric.</summary>
@@ -204,135 +205,86 @@
             <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
             <returns>Task.</returns>
         </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmailBase.Provider">
-            <summary>Gets or sets the email provider to use while sending.</summary>
-            <value>The email provider.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmailBase.To">
-            <summary>Gets or sets the recipient list (send as blind carbon copy).</summary>
-            <value>List of string recipients.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmailBase.Subject">
-            <summary>Gets or sets the email subject.</summary>
-            <value>The email subject.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmailBase.TemplateName">
-            <summary>Gets or sets the name of the email template to use.</summary>
-            <value>The name of the template.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmailBase.Content">
-            <summary>Gets or sets the email content.</summary>
-            <value>The email content.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmailBase.IsPlainText">
-            <summary>
-            Gets or sets a value indicating whether this instance is plain text.
-            </summary>
-            <value><c>true</c> if this instance is plain text; otherwise, <c>false</c>.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.CreateEmailBase.Links">
-            <summary>
-            Gets or sets the links.
-            </summary>
-            <value>The links.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.CreateSmsBase.Provider">
-            <summary>Gets or sets the sms provider to use while sending.</summary>
-            <value>The sms provider.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.CreateSmsBase.To">
-            <summary>Gets or sets the recipient list.</summary>
-            <value>To.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.CreateSmsBase.Text">
-            <summary>Gets or sets the message text.</summary>
-            <value>The text.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.CreateSmsBase.Links">
-            <summary>
-            Gets or sets the links.
-            </summary>
-            <value>The links.</value>
-        </member>
         <member name="T:Cloud.Core.NotificationHub.Models.DTO.CreateEmail">
-            <summary>
-            Class CreateEmail.
-            </summary>
+            <summary>Create Email.</summary>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateEmail.Provider">
+            <summary>Gets or sets the email provider to use while sending.</summary>
+            <example>EmailProviders.SmtpProvider</example>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateEmail.To">
+            <summary>Recipient list for the email (sent as blind carbon copy).</summary>
+            <example>
+            - robert.mccabe@outlook.com
+            </example>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateEmail.Subject">
+            <summary>Subject for the email being sent.</summary>
+            <example>Test subject</example>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateEmail.TemplateName">
+            <summary>Gets or sets the name of the email template to use.</summary>
+            <example>Lev_SalesInvoice_en</example>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateEmail.Content">
+            <summary>Gets or sets the email content.</summary>
+            <example><h1>This is an example email!</h1></example>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateEmail.IsPlainText">
+            <summary>Indicate whether the email is plain text only. <c>True</c> if this instance is plain text; otherwise, <c>false</c>.</summary>
+            <example>true</example>
         </member>
         <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateEmail.Attachments">
-            <summary>Gets or sets the email attachments.</summary>
-            <value>The attachments.</value>
+            <summary>The email attachments.</summary>
+        </member>
+        <member name="M:Cloud.Core.NotificationHub.Models.DTO.CreateEmail.op_Implicit(Cloud.Core.NotificationHub.Models.DTO.CreateEmail)~Cloud.Core.EmailMessage">
+            <summary>
+            Performs an implicit conversion from <see cref="T:Cloud.Core.NotificationHub.Models.DTO.CreateEmail"/> to <see cref="T:Cloud.Core.EmailMessage"/>.
+            </summary>
+            <param name="source">The source.</param>
+            <returns>The result of the conversion.</returns>
+        </member>
+        <member name="T:Cloud.Core.NotificationHub.Models.DTO.CreatePush">
+            <summary>Create push event.</summary>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreatePush.EventName">
+            <summary>Event name to push for the subscribers.</summary>
+            <example>LoginEvent</example>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreatePush.Title">
+            <summary>Push notification title.</summary>
+            <example>New Login!</example>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreatePush.Body">
+            <summary>Push notification body to display.</summary>
+            <example>You have logged in from another device.</example>
         </member>
         <member name="T:Cloud.Core.NotificationHub.Models.DTO.CreateSms">
-            <summary>
-            Class CreateSms
-            </summary>
+            <summary>Create Sms message.</summary>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateSms.Provider">
+            <summary>Sms provider to use while sending.</summary>
+            <example>SmsProviders.ClickatelProvider</example>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateSms.To">
+            <summary>Recipient list of phone numbers, with area codes.</summary>
+            <example>
+            +447398225155
+            </example>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateSms.Text">
+            <summary>Sms message text to send.</summary>
+            <example>This is an example sms message.</example>
         </member>
         <member name="P:Cloud.Core.NotificationHub.Models.DTO.CreateSms.Attachments">
-            <summary>Gets or sets the sms attachments.</summary>
-            <value>The attachments.</value>
+            <summary>List of attachment id's to use when generating the message.</summary>
         </member>
-        <member name="T:Cloud.Core.NotificationHub.Models.Events.EmailEvent">
+        <member name="M:Cloud.Core.NotificationHub.Models.DTO.CreateSms.op_Implicit(Cloud.Core.NotificationHub.Models.DTO.CreateSms)~Cloud.Core.SmsMessage">
             <summary>
-            Class CreateEmail.
+            Performs an implicit conversion from <see cref="T:Cloud.Core.NotificationHub.Models.DTO.CreateSms"/> to <see cref="T:Cloud.Core.SmsMessage"/>.
             </summary>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.Events.EmailEvent.Provider">
-            <summary>Gets or sets the email provider to use while sending.</summary>
-            <value>The email provider.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.Events.EmailEvent.To">
-            <summary>Gets or sets the recipient list (send as blind carbon copy).</summary>
-            <value>List of string recipients.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.Events.EmailEvent.Subject">
-            <summary>Gets or sets the email subject.</summary>
-            <value>The email subject.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.Events.EmailEvent.TemplateName">
-            <summary>Gets or sets the name of the email template to use.</summary>
-            <value>The name of the template.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.Events.EmailEvent.Content">
-            <summary>Gets or sets the email content.</summary>
-            <value>The email content.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.Events.EmailEvent.IsPlainText">
-            <summary>
-            Gets or sets a value indicating whether this instance is plain text.
-            </summary>
-            <value><c>true</c> if this instance is plain text; otherwise, <c>false</c>.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.Events.EmailEvent.AttachmentIds">
-            <summary>Gets or sets the email attachments.</summary>
-            <value>The attachments.</value>
-        </member>
-        <member name="T:Cloud.Core.NotificationHub.Models.Events.SmsEvent">
-            <summary>
-            Class CreateSms
-            </summary>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.Events.SmsEvent.Provider">
-            <summary>Gets or sets the sms provider to use while sending.</summary>
-            <value>The sms provider.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.Events.SmsEvent.To">
-            <summary>Gets or sets the recipient list.</summary>
-            <value>To.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.Events.SmsEvent.Text">
-            <summary>Gets or sets the message text.</summary>
-            <value>The text.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.Events.SmsEvent.Links">
-            <summary>
-            Gets or sets the links.
-            </summary>
-            <value>The links.</value>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Models.Events.SmsEvent.AttachmentIds">
-            <summary>Gets or sets the email attachments.</summary>
-            <value>The attachments.</value>
+            <param name="source">The source.</param>
+            <returns>The result of the conversion.</returns>
         </member>
         <member name="T:Cloud.Core.NotificationHub.Models.EmailProviders">
             <summary>Email provider enumeration.</summary>
@@ -358,11 +310,57 @@
         <member name="F:Cloud.Core.NotificationHub.Models.SmsProviders.TextlocalProvider">
             <summary>Textlocal provider.</summary>
         </member>
+        <member name="F:Cloud.Core.NotificationHub.Models.SmsProviders.DummySmsProvider">
+            <summary>Dummy sms provider for testing.</summary>
+        </member>
         <member name="T:Cloud.Core.NotificationHub.Program">
             <summary> Main application class.</summary>
         </member>
         <member name="M:Cloud.Core.NotificationHub.Program.Main(System.String[])">
             <summary>Defines the entry point of the application.</summary>
+        </member>
+        <member name="T:Cloud.Core.NotificationHub.Providers.BitlyConfig">
+            <summary>Bit.ly url shortener configuration class.</summary>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Providers.BitlyConfig.ApiKey">
+            <summary>The bit.ly API key.</summary>
+        </member>
+        <member name="T:Cloud.Core.NotificationHub.Providers.BitlyShortenResult">
+            <summary>Bitly shorten result.
+            Implements the <see cref="T:Cloud.Core.IUrlShortenResult" />
+            </summary>
+            <seealso cref="T:Cloud.Core.IUrlShortenResult" />
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Providers.BitlyShortenResult.SourceLink">
+            <summary>Original source link to shorten.</summary>
+        </member>
+        <member name="P:Cloud.Core.NotificationHub.Providers.BitlyShortenResult.ShortLink">
+            <summary>Shortened version of the link.</summary>
+        </member>
+        <member name="T:Cloud.Core.NotificationHub.Providers.BitlyUrlService">
+            <summary>
+            Bitly url shortener service.
+            Implements the <see cref="T:Cloud.Core.IUrlShortener" />
+            </summary>
+            <seealso cref="T:Cloud.Core.IUrlShortener" />
+        </member>
+        <member name="M:Cloud.Core.NotificationHub.Providers.BitlyUrlService.#ctor(Cloud.Core.NotificationHub.Providers.BitlyConfig)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cloud.Core.NotificationHub.Providers.BitlyUrlService"/> class.
+            </summary>
+            <param name="config">The configuration.</param>
+        </member>
+        <member name="M:Cloud.Core.NotificationHub.Providers.BitlyUrlService.#ctor(Cloud.Core.NotificationHub.Providers.BitlyConfig,System.Net.Http.HttpClient)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cloud.Core.NotificationHub.Providers.BitlyUrlService" /> class.
+            </summary>
+            <param name="config">The configuration.</param>
+            <param name="httpClient">The http client.</param>
+        </member>
+        <member name="M:Cloud.Core.NotificationHub.Providers.BitlyUrlService.ShortenLink(System.Uri)">
+            <summary>Shorten the passed in link.</summary>
+            <param name="original">Original link to shorten.</param>
+            <returns>Task ILinkShortenResult with the short link.</returns>
         </member>
         <member name="P:Cloud.Core.NotificationHub.Providers.DummyEmailProvider.Name">
             <summary>Gets or sets the name for the implementor of the INamedInstance interface.</summary>
