@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Cloud.Core.Notification.Events;
+using Cloud.Core.NotificationHub.Models;
 using Cloud.Core.NotificationHub.Models.DTO;
 using Cloud.Core.Web;
 using Microsoft.AspNetCore.Http;
@@ -10,7 +11,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace Cloud.Core.NotificationHub.Controllers
 {
     /// <summary>
-    /// Class EmailController.
+    /// Send email synchronously and asynchronously.
     /// Implements the <see cref="ControllerBase" />
     /// </summary>
     /// <seealso cref="ControllerBase" />
@@ -28,10 +29,10 @@ namespace Cloud.Core.NotificationHub.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="EmailController" /> class.
         /// </summary>
-        /// <param name="emailProviders">The email providers.</param>
-        /// <param name="messengers">The messengers.</param>
-        /// <param name="blobStorage">The BLOB storage.</param>
-        /// <param name="settings">The settings.</param>
+        /// <param name="emailProviders">Configured email providers.</param>
+        /// <param name="messengers">EDA messengers list.</param>
+        /// <param name="blobStorage">Blob storage.</param>
+        /// <param name="settings">Application settings.</param>
         public EmailController(NamedInstanceFactory<IEmailProvider> emailProviders, NamedInstanceFactory<IReactiveMessenger> messengers, IBlobStorage blobStorage, AppSettings settings)
         {
             _emailProviders = emailProviders;
@@ -56,9 +57,14 @@ namespace Cloud.Core.NotificationHub.Controllers
                 return BadRequest(new ApiErrorResult(ModelState));
             }
 
-            if (!_emailProviders.GetInstanceNames().Contains(email.Provider.Value.ToString()))
+            // Default the provider if not set.
+            if (email.Provider.IsNullOrDefault())
+                email.Provider = _settings.DefaultEmailProvider as EmailProviders?;
+
+            if (!_emailProviders.TryGetValue(email.Provider.ToString(), out _))
             {
                 ModelState.AddModelError("Provider", $"{email.Provider.Value} has no implementation");
+                return BadRequest(new ApiErrorResult(ModelState));
             }
 
             // Validate the attachments, if invalid type or exceeds max allowed size.
@@ -100,9 +106,14 @@ namespace Cloud.Core.NotificationHub.Controllers
                 return BadRequest(new ApiErrorResult(ModelState));
             }
 
-            if (!_emailProviders.GetInstanceNames().Contains(email.Provider))
+            // Default the provider if not set.
+            if (email.Provider.IsNullOrDefault())
+                email.Provider = _settings.DefaultSmsProvider.ToString();
+
+            if (!_emailProviders.TryGetValue(email.Provider.ToString(), out _))
             {
                 ModelState.AddModelError("Provider", $"{email.Provider} has no implementation");
+                return BadRequest(new ApiErrorResult(ModelState));
             }
 
             foreach (var attId in email.AttachmentIds)

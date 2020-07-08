@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Cloud.Core.NotificationHub.Models;
 
 namespace Cloud.Core.NotificationHub
 {
@@ -29,11 +30,11 @@ namespace Cloud.Core.NotificationHub
 
         /// <summary>Gets or sets the default email provider.</summary>
         /// <value>The default email provider.</value>
-        public string DefaultEmailProvider { get; set; }
+        public EmailProviders DefaultEmailProvider { get; set; }
 
         /// <summary>Gets or sets the default SMS provider.</summary>
         /// <value>The default SMS provider.</value>
-        public string DefaultSmsProvider { get; set; }
+        public SmsProviders DefaultSmsProvider { get; set; }
 
         /// <summary>Gets the allowed attachment types list.</summary>
         /// <value>The allowed attachment types list.</value>

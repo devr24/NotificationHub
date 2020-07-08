@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Cloud.Core.Links.Bitly;
 using Cloud.Core.Messaging.AzureServiceBus.Models;
 using Cloud.Core.Notification.Clickatel;
 using Cloud.Core.Notification.Smtp;

@@ -33,8 +33,7 @@ namespace Cloud.Core.NotificationHub.Controllers
         }
 
         /// <summary>
-        /// Create push notification for all subscribers
-        /// POST api/v1/values
+        /// Create push notification for all subscribers.
         /// </summary>
         /// <returns>IEnumerable&lt;System.String&gt;.</returns>
         /// <exception cref="InvalidOperationException">Somethings gone wrong!</exception>
@@ -48,8 +47,7 @@ namespace Cloud.Core.NotificationHub.Controllers
         }
 
         /// <summary>
-        /// Subscribe to a push notification - implemented using SignalR.
-        /// POST api/v1/values
+        /// Subscribe to a push notification - will implement using SignalR.
         /// </summary>
         /// <returns>IEnumerable&lt;System.String&gt;.</returns>
         /// <exception cref="InvalidOperationException">Somethings gone wrong!</exception>

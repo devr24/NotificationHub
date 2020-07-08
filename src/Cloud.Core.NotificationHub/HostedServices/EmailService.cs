@@ -71,35 +71,28 @@
             {
                 // Default the provider if not set.
                 if (message.Provider.IsNullOrEmpty())
-                    message.Provider = _settings.DefaultEmailProvider;
+                    message.Provider = _settings.DefaultEmailProvider.ToString();
 
                 // Ensure the provider exists.
-                if (!_emailProviders.GetInstanceNames().Contains(message.Provider))
+                if (!_emailProviders.TryGetValue(message.Provider, out var emailProvider))
                 {
-                    _logger.LogWarning($"{message.Provider} has no implementation, erroring message");
+                    _logger.LogWarning($"{message.Provider} has no email implementation, erroring message");
                     await _messenger.Error(message, $"{message.Provider} has no implementation");
+                    return;
                 }
 
-                var emailProvider = _emailProviders[message.Provider.ToString()];
-
+                // Get email message and attachments (if any).
                 EmailMessage email = message;
-
-                if (message.AttachmentIds != null)
+                foreach (var attachmentId in message?.AttachmentIds)
                 {
-                    foreach (var attachmentId in message.AttachmentIds)
-                    {
-                        var path = $"{_settings.AttachmentContainerName}/{attachmentId}";
-                        var blobData = await _blobStorage.GetBlob(path, true);
+                    var path = $"{_settings.AttachmentContainerName}/{attachmentId}";
+                    var blobData = await _blobStorage.GetBlob(path, true);
 
-                        if (!blobData.Metadata.TryGetValue("type", out var contentType))
-                        {
-                            contentType = DefaultContentType;
-                        }
-
-                        email.Attachments.Add(new EmailAttachment { Content = await _blobStorage.DownloadBlob(path), Name = blobData.Metadata["name"], ContentType = contentType });
-
-                        Interlocked.Increment(ref _messageAttachments);
-                    }
+                    if (!blobData.Metadata.TryGetValue("type", out var contentType))
+                        contentType = DefaultContentType;
+                    
+                    email.Attachments.Add(new EmailAttachment { Content = await _blobStorage.DownloadBlob(path), Name = blobData.Metadata["name"], ContentType = contentType });
+                    Interlocked.Increment(ref _messageAttachments);
                 }
 
                 // Send the mail.

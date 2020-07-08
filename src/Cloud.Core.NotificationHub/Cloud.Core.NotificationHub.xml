@@ -100,16 +100,14 @@
         </member>
         <member name="M:Cloud.Core.NotificationHub.Controllers.PushController.Post(Cloud.Core.NotificationHub.Models.DTO.CreatePush)">
             <summary>
-            Create push notification for all subscribers
-            POST api/v1/values
+            Create push notification for all subscribers.
             </summary>
             <returns>IEnumerable&lt;System.String&gt;.</returns>
             <exception cref="T:System.InvalidOperationException">Somethings gone wrong!</exception>
         </member>
         <member name="M:Cloud.Core.NotificationHub.Controllers.PushController.Post(System.String)">
             <summary>
-            Subscribe to a push notification - implemented using SignalR.
-            POST api/v1/values
+            Subscribe to a push notification - will implement using SignalR.
             </summary>
             <returns>IEnumerable&lt;System.String&gt;.</returns>
             <exception cref="T:System.InvalidOperationException">Somethings gone wrong!</exception>
@@ -318,49 +316,6 @@
         </member>
         <member name="M:Cloud.Core.NotificationHub.Program.Main(System.String[])">
             <summary>Defines the entry point of the application.</summary>
-        </member>
-        <member name="T:Cloud.Core.NotificationHub.Providers.BitlyConfig">
-            <summary>Bit.ly url shortener configuration class.</summary>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.BitlyConfig.ApiKey">
-            <summary>The bit.ly API key.</summary>
-        </member>
-        <member name="T:Cloud.Core.NotificationHub.Providers.BitlyShortenResult">
-            <summary>Bitly shorten result.
-            Implements the <see cref="T:Cloud.Core.IUrlShortenResult" />
-            </summary>
-            <seealso cref="T:Cloud.Core.IUrlShortenResult" />
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.BitlyShortenResult.SourceLink">
-            <summary>Original source link to shorten.</summary>
-        </member>
-        <member name="P:Cloud.Core.NotificationHub.Providers.BitlyShortenResult.ShortLink">
-            <summary>Shortened version of the link.</summary>
-        </member>
-        <member name="T:Cloud.Core.NotificationHub.Providers.BitlyUrlService">
-            <summary>
-            Bitly url shortener service.
-            Implements the <see cref="T:Cloud.Core.IUrlShortener" />
-            </summary>
-            <seealso cref="T:Cloud.Core.IUrlShortener" />
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.BitlyUrlService.#ctor(Cloud.Core.NotificationHub.Providers.BitlyConfig)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Cloud.Core.NotificationHub.Providers.BitlyUrlService"/> class.
-            </summary>
-            <param name="config">The configuration.</param>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.BitlyUrlService.#ctor(Cloud.Core.NotificationHub.Providers.BitlyConfig,System.Net.Http.HttpClient)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Cloud.Core.NotificationHub.Providers.BitlyUrlService" /> class.
-            </summary>
-            <param name="config">The configuration.</param>
-            <param name="httpClient">The http client.</param>
-        </member>
-        <member name="M:Cloud.Core.NotificationHub.Providers.BitlyUrlService.ShortenLink(System.Uri)">
-            <summary>Shorten the passed in link.</summary>
-            <param name="original">Original link to shorten.</param>
-            <returns>Task ILinkShortenResult with the short link.</returns>
         </member>
         <member name="P:Cloud.Core.NotificationHub.Providers.DummyEmailProvider.Name">
             <summary>Gets or sets the name for the implementor of the INamedInstance interface.</summary>

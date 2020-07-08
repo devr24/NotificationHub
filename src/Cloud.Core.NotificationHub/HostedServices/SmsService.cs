@@ -75,15 +75,18 @@ namespace Cloud.Core.NotificationHub.HostedServices
         public Task StartAsync(CancellationToken cancellationToken)
         {
             // Start reading messages from Service Bus.
-            _messenger.StartReceive<SmsEvent>().Subscribe(async message => 
+            _messenger.StartReceive<SmsEvent>().Subscribe(async message =>
             {
-                if (!_smsProviders.GetInstanceNames().Contains(message.SmsProvider))
+                // Default the provider if not set.
+                if (message.SmsProvider.IsNullOrEmpty())
+                    message.SmsProvider = _settings.DefaultSmsProvider.ToString();
+
+                if (!_smsProviders.TryGetValue(message.SmsProvider, out var smsProvider))
                 {
                     _logger.LogWarning($"{message.SmsProvider} has no sms implementation, erroring message");
                     await _messenger.Error(message, $"{message.SmsProvider} has no implementation");
+                    return;
                 }
-
-                var smsProvider = _smsProviders[message.SmsProvider.ToString()];
 
                 SmsMessage sms = message;
 
@@ -100,17 +103,21 @@ namespace Cloud.Core.NotificationHub.HostedServices
 
                         // Get the long sas url for the public facing blob.
                         var sasUrl = await _blobStorage.GetSignedBlobAccessUrl(publicPath, new SignedAccessConfig(new List<AccessPermission> { AccessPermission.Read }));
+                        Interlocked.Increment(ref _sasUrlsGenerated);
 
                         // Get the short link for the sas url.  This is easier to use on the phone!
                         var shortLink = await _urlShortener.ShortenLink(new Uri(sasUrl));
-
-                        sms.Links.Add(new SmsLink
+                        if (shortLink.Success)
                         {
-                            Title = fileName,
-                            Link = shortLink.ShortLink
-                        });
-                        Interlocked.Increment(ref _sasUrlsGenerated);
-                        Interlocked.Increment(ref _bitlyGenerated);
+                            sms.Links.Add(new SmsLink
+                            {
+                                Title = fileName,
+                                Link = shortLink.ShortLink
+                            });
+                            Interlocked.Increment(ref _bitlyGenerated);
+                        }
+                        else
+                            _logger.LogInformation($"Could not generate shortened link, {shortLink.Message}");
                     }
                 }
                 var result = await smsProvider.SendAsync(sms);

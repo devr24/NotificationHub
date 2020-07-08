@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Cloud.Core.Notification.Events;
+using Cloud.Core.NotificationHub.Models;
 using Cloud.Core.NotificationHub.Models.DTO;
 using Cloud.Core.Web;
 using Microsoft.AspNetCore.Http;
@@ -10,7 +11,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace Cloud.Core.NotificationHub.Controllers
 {
     /// <summary>
-    /// Class SmsController.
+    /// Send Sms messages synchronously and asynchronously.
     /// Implements the <see cref="ControllerBase" />
     /// </summary>
     /// <seealso cref="ControllerBase" />
@@ -28,10 +29,10 @@ namespace Cloud.Core.NotificationHub.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="SmsController" /> class.
         /// </summary>
-        /// <param name="smsProviders">The SMS providers.</param>
-        /// <param name="messengers">The messengers.</param>
-        /// <param name="blobStorage">The BLOB storage.</param>
-        /// <param name="settings">The settings.</param>
+        /// <param name="smsProviders">Configured sms providers.</param>
+        /// <param name="messengers">EDA messengers list.</param>
+        /// <param name="blobStorage">Blob storage.</param>
+        /// <param name="settings">Application settings.</param>
         public SmsController(NamedInstanceFactory<ISmsProvider> smsProviders, NamedInstanceFactory<IReactiveMessenger> messengers, IBlobStorage blobStorage, AppSettings settings)
         {
             _smsProviders = smsProviders;
@@ -49,16 +50,18 @@ namespace Cloud.Core.NotificationHub.Controllers
         [RequestFormLimits(MultipartBodyLengthLimit = AppSettings.RequestSizeBytesLimit)] // 5mb limit
         public async Task<IActionResult> CreateSms([FromForm] CreateSms sms)
         {
-            // TODO: REPLACE WITH FLUENT VALIDATION AND CREATE SMS VALIDATOR.
             // If the model state is invalid (i.e. required fields are missing), then return bad request.
             if (!ModelState.IsValid)
-            {
                 return BadRequest(new ApiErrorResult(ModelState));
-            }
 
-            if (!_smsProviders.GetInstanceNames().Contains(sms.Provider.Value.ToString()))
+            // Default the provider if not set.
+            if (sms.Provider.IsNullOrDefault())
+                sms.Provider = _settings.DefaultSmsProvider as SmsProviders?;
+
+            if (!_smsProviders.TryGetValue(sms.Provider.ToString(), out var smsProvider))
             {
                 ModelState.AddModelError("Provider", $"{sms.Provider.Value} has no implementation");
+                return BadRequest(new ApiErrorResult(ModelState));
             }
 
             // Validate the attachments, if invalid type or exceeds max allowed size.
@@ -79,7 +82,6 @@ namespace Cloud.Core.NotificationHub.Controllers
             }
 
             // Send sms using the requested provider.
-            var smsProvider = _smsProviders[sms.Provider.ToString()];
             await smsProvider.SendAsync(sms);
             return Ok();
         }
@@ -96,13 +98,16 @@ namespace Cloud.Core.NotificationHub.Controllers
             // TODO: REPLACE WITH FLUENT VALIDATION AND CREATE SMS VALIDATOR.
             // If the model state is invalid (i.e. required fields are missing), then return bad request.
             if (!ModelState.IsValid)
-            {
                 return BadRequest(new ApiErrorResult(ModelState));
-            }
 
-            if (!_smsProviders.GetInstanceNames().Contains(sms.SmsProvider))
+            // Default the provider if not set.
+            if (sms.SmsProvider.IsNullOrDefault())
+                sms.SmsProvider = _settings.DefaultSmsProvider.ToString();
+
+            if (!_smsProviders.TryGetValue(sms.SmsProvider.ToString(), out _))
             {
                 ModelState.AddModelError("Provider", $"{sms.SmsProvider} has no implementation");
+                return BadRequest(new ApiErrorResult(ModelState));
             }
 
             foreach (var attId in sms.AttachmentIds)
