@@ -131,20 +131,20 @@ namespace Cloud.Core.NotificationHub
             // Add Mvc 
             services.AddHealthChecks();
             services.AddControllers();
-            services.AddSwaggerWithVersions(_appVersions, c => { 
-                c.IncludeXmlComments("Cloud.Core.NotificationHub.xml");
-                //c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { 
-                //    Version  = "v1",
-                //    Title = "Notification Hub API",
-                //    Description = "This documentation describes the endpoints available for the Notification Hub API",
-                //    Contact = new Microsoft.OpenApi.Models.OpenApiContact
-                //    {
-                //        Email = "robert.mccabe@outlook.com",
-                //        Name = "Robert McCabe"
-                //    }
-                //});
+            services.AddSwaggerWithVersions(_appVersions, c => c.IncludeXmlComments("Cloud.Core.NotificationHub.xml"), v => {
 
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Notification Hub API", Version = "v1" });
+                var description = new OpenApiInfo {
+                    Title = "Notification Hub API",
+                    Version = $"v{v}",
+                    Description = "Send notifications of various types, synchronously or asynchronously.",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Robert McCabe",
+                        Email = "robert.mccabe@outlook.com"
+                    }
+                };
+
+                return description;
             });
             services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
             services.AddRouting(options => options.LowercaseUrls = true);

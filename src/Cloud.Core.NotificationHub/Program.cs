@@ -33,9 +33,11 @@ namespace Cloud.Core.NotificationHub
         private static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration(config => {
+
                     // Import default configurations (env vars, command line args, appSettings.json etc).
                     config.UseDefaultConfigs();
 
+                    // Load config from key vault.
                     config.AddKeyVaultSecrets(config.GetValue<string>("KeyVaultInstanceName"),
                         "TenantId",
                         "SubscriptionId",

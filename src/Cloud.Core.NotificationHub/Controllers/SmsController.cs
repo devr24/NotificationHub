@@ -95,7 +95,6 @@ namespace Cloud.Core.NotificationHub.Controllers
         [RequestFormLimits(MultipartBodyLengthLimit = AppSettings.RequestSizeBytesLimit)] // 5mb limit
         public async Task<IActionResult> CreateSmsAsync([FromBody] SmsEvent sms)
         {
-            // TODO: REPLACE WITH FLUENT VALIDATION AND CREATE SMS VALIDATOR.
             // If the model state is invalid (i.e. required fields are missing), then return bad request.
             if (!ModelState.IsValid)
                 return BadRequest(new ApiErrorResult(ModelState));

@@ -26,7 +26,7 @@
     <PackageReference Include="Cloud.Core.SecureVault.AzureKeyVault" Version="3.1.3593.626" />
     <PackageReference Include="Cloud.Core.Storage.AzureBlobStorage" Version="3.1.3593.650" />
     <PackageReference Include="Cloud.Core.Telemetry.AzureAppInsights" Version="3.1.3593.627" />
-    <PackageReference Include="Cloud.Core.Web" Version="3.1.3593.618" />
+    <PackageReference Include="Cloud.Core.Web" Version="3.1.3595.680" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.3" />
