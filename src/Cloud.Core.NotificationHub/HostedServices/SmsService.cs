@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Cloud.Core.Notification.Events;
-using Cloud.Core.Services;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
-namespace Cloud.Core.NotificationHub.HostedServices
+﻿namespace Cloud.Core.NotificationHub.HostedServices
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
+    using Notification.Events;
+    using Services;
+
     /// <summary>
-    /// Class SmsService.
+    /// Class Sms Service will process sms related notification messages.
     /// Implements the <see cref="IHostedService" />
     /// </summary>
     /// <seealso cref="IHostedService" />
@@ -25,8 +25,9 @@ namespace Cloud.Core.NotificationHub.HostedServices
         private readonly NamedInstanceFactory<ISmsProvider> _smsProviders;
         private readonly IUrlShortener _urlShortener;
         private int _messagesProcessed = 0;
-        private int _bitlyGenerated = 0;
+        private int _shortLinksGenerated = 0;
         private int _sasUrlsGenerated = 0;
+        private int _messagesFailed = 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SmsService" /> class.
@@ -63,11 +64,13 @@ namespace Cloud.Core.NotificationHub.HostedServices
             // Customise your statistics logging here.
             _telemetryLogger.LogMetric("Messages Processed", _messagesProcessed);
             _telemetryLogger.LogMetric("Sas Urls Created", _sasUrlsGenerated);
-            _telemetryLogger.LogMetric("Bitly Urls Created", _bitlyGenerated);
+            _telemetryLogger.LogMetric("Bitly Urls Created", _shortLinksGenerated);
+            _telemetryLogger.LogMetric("Messages Failed", _messagesFailed);
 
             Interlocked.Exchange(ref _messagesProcessed, 0);
+            Interlocked.Exchange(ref _messagesFailed, 0);
             Interlocked.Exchange(ref _sasUrlsGenerated, 0);
-            Interlocked.Exchange(ref _bitlyGenerated, 0);
+            Interlocked.Exchange(ref _shortLinksGenerated, 0);
         }
 
         /// <summary>start as an asynchronous operation.</summary>
@@ -77,57 +80,41 @@ namespace Cloud.Core.NotificationHub.HostedServices
             // Start reading messages from Service Bus.
             _messenger.StartReceive<SmsEvent>().Subscribe(async message =>
             {
-                // Default the provider if not set.
-                if (message.SmsProvider.IsNullOrEmpty())
-                    message.SmsProvider = _settings.DefaultSmsProvider.ToString();
-
-                if (!_smsProviders.TryGetValue(message.SmsProvider, out var smsProvider))
+                try
                 {
-                    _logger.LogWarning($"{message.SmsProvider} has no sms implementation, erroring message");
-                    await _messenger.Error(message, $"{message.SmsProvider} has no implementation");
-                    return;
-                }
+                    // Default the provider if not set.
+                    if (message.SmsProvider.IsNullOrEmpty())
+                        message.SmsProvider = _settings.DefaultSmsProvider.ToString();
 
-                SmsMessage sms = message;
-
-                if (message.AttachmentIds != null)
-                {
-                    foreach (var attachmentId in message.AttachmentIds)
+                    if (!_smsProviders.TryGetValue(message.SmsProvider, out var smsProvider))
                     {
-                        var sourcePath = $"{_settings.AttachmentContainerName}/{attachmentId}";
-                        var blobData = await _blobStorage.GetBlob(sourcePath, true);
-                        var fileName = blobData.Metadata["name"];
-                        var publicPath = $"{_settings.AttachmentContainerName}/public/{attachmentId}/{fileName}";
-
-                        await ((Storage.AzureBlobStorage.BlobStorage)_blobStorage).CopyFile(sourcePath, publicPath);
-
-                        // Get the long sas url for the public facing blob.
-                        var sasUrl = await _blobStorage.GetSignedBlobAccessUrl(publicPath, new SignedAccessConfig(new List<AccessPermission> { AccessPermission.Read }));
-                        Interlocked.Increment(ref _sasUrlsGenerated);
-
-                        // Get the short link for the sas url.  This is easier to use on the phone!
-                        var shortLink = await _urlShortener.ShortenLink(new Uri(sasUrl));
-                        if (shortLink.Success)
-                        {
-                            sms.Links.Add(new SmsLink
-                            {
-                                Title = fileName,
-                                Link = shortLink.ShortLink
-                            });
-                            Interlocked.Increment(ref _bitlyGenerated);
-                        }
-                        else
-                            _logger.LogInformation($"Could not generate shortened link, {shortLink.Message}");
+                        throw new InvalidOperationException($"No implementation for provider {message.SmsProvider}");
                     }
+
+                    SmsMessage sms = message;
+
+                    // Add attachment links (if attachments are requested).
+                    if (message.AttachmentIds != null)
+                    {
+                        // Create a public link for the attachment.
+                        foreach (var attachmentId in message.AttachmentIds)
+                            sms.Links.Add(await GetAttachmentLink(attachmentId));
+                    }
+
+                    // Send the Sms and complete the message.
+                    await smsProvider.SendAsync(sms);
+
+                    // When finished, complete the message.
+                    await _messenger.Complete(message);
+                    _logger.LogDebug($"Sms sent successfully. To {sms.To.Count} recipients, Text: {sms.FullContent}{(sms.Links.Any() ? string.Join(",", sms.Links.Select(l => l.Link)) : "")}");
+                    Interlocked.Increment(ref _messagesProcessed);
                 }
-                var result = await smsProvider.SendAsync(sms);
-
-                // When finished, complete the message.
-                await _messenger.Complete(message);
-
-                _logger.LogDebug($"Sms {(result ? "sent successfully": "failed to send")} to {sms.To.Count} recipients, Text: {sms.FullContent}{(sms.Links.Any() ? string.Join(",", sms.Links.Select(l => l.Link)) : "")}");
-
-                Interlocked.Increment(ref _messagesProcessed);
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, ex.Message);
+                    await _messenger.Error(message, ex.Message);
+                    Interlocked.Increment(ref _messagesFailed);
+                }
             });
 
             return Task.FromResult(true);
@@ -139,6 +126,45 @@ namespace Cloud.Core.NotificationHub.HostedServices
         public Task StopAsync(CancellationToken cancellationToken)
         {
             return Task.FromResult(true);
+        }
+
+        /// <summary>
+        /// Gets the attachment link by moving the attchment to a public access folder, then creating a sasUrl which is (.
+        /// </summary>
+        /// <param name="attachmentId">The attachment identifier.</param>
+        /// <returns>SmsLink.</returns>
+        /// <exception cref="System.InvalidOperationException">Cannot find attachment at {path}</exception>
+        /// <exception cref="System.InvalidOperationException">Could not generate shortened link for {path} [Public path: {publicPath}, Sas url: {sasUrl}]</exception>
+        private async Task<SmsLink> GetAttachmentLink(Guid attachmentId)
+        {
+            var path = $"{_settings.AttachmentContainerName}/{attachmentId}";
+
+            // Look the attachment up in storage.
+            var blobData = await _blobStorage.GetBlob(path, true);
+            if (blobData == null)
+                throw new InvalidOperationException($"Cannot find attachment at {path}");
+
+            var fileName = blobData.Metadata["name"];
+            var publicPath = $"{_settings.AttachmentContainerName}/public/{attachmentId}/{fileName}";
+
+            // Server side file copy to a public directory.
+            await((Storage.AzureBlobStorage.BlobStorage)_blobStorage).CopyFile(path, publicPath);
+
+            // Get the long sas url for the public facing blob.
+            var sasUrl = await _blobStorage.GetSignedBlobAccessUrl(publicPath, new SignedAccessConfig(new List<AccessPermission> { AccessPermission.Read }));
+            Interlocked.Increment(ref _sasUrlsGenerated);
+
+            // Get the short link for the sas url.  This is easier to use on the phone!
+            var shortLink = await _urlShortener.ShortenLink(new Uri(sasUrl));
+            if (!shortLink.Success)
+                throw new InvalidOperationException($"Could not generate shortened link for {path} [Public path: {publicPath}, Sas url: {sasUrl}]");
+
+            Interlocked.Increment(ref _shortLinksGenerated);
+
+            return new SmsLink{
+                Title = fileName,
+                Link = shortLink.ShortLink
+            };
         }
     }
 }

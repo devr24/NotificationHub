@@ -20,6 +20,7 @@ namespace Cloud.Core.NotificationHub.Controllers
     [Produces("application/json")]
     public class AttachmentController : ControllerBase
     {
+        private const string DefaultContentType = "application/octet-stream";
         private readonly IBlobStorage _blobStorage;
         private readonly AppSettings _settings;
 
@@ -42,7 +43,6 @@ namespace Cloud.Core.NotificationHub.Controllers
         [SwaggerResponse(200, "Attachment", typeof(FileStreamResult))]
         public async Task<IActionResult> GetAttachment(Guid id)
         {
-            const string defaultMimeType = "application/octet-stream";
             var filePath = $"{_settings.AttachmentContainerName}/{id}";
 
             // Return not found result if the blob does not exist.
@@ -58,7 +58,7 @@ namespace Cloud.Core.NotificationHub.Controllers
             var fileName = blobData.Metadata["name"];
 
             if (!blobData.Metadata.TryGetValue("type", out var contentType))
-                contentType = defaultMimeType;
+                contentType = DefaultContentType;
 
             return new FileStreamResult(await _blobStorage.DownloadBlob(filePath), contentType) 
             { 

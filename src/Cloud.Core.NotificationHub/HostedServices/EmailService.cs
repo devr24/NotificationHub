@@ -3,13 +3,13 @@
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Cloud.Core.Notification.Events;
-    using Cloud.Core.Services;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
+    using Notification.Events;
+    using Services;
 
     /// <summary>
-    /// Class EmailService.
+    /// Class Email Service will process email related notification messages.
     /// Implements the <see cref="IHostedService" />
     /// </summary>
     /// <seealso cref="IHostedService" />
@@ -23,6 +23,7 @@
         private readonly NamedInstanceFactory<IEmailProvider> _emailProviders;
         private int _messagesProcessed = 0;
         private int _messageAttachments = 0;
+        private int _messagesFailed = 0;
         private const string DefaultContentType = "application/octet-stream";
 
         /// <summary>
@@ -57,8 +58,11 @@
 
             // Customise your statistics logging here.
             _telemetryLogger.LogMetric("Messages Processed", _messagesProcessed);
+            _telemetryLogger.LogMetric("Messages Failed", _messagesFailed);
+            _telemetryLogger.LogMetric("Message Attachments", _messageAttachments);
 
             Interlocked.Exchange(ref _messagesProcessed, 0);
+            Interlocked.Exchange(ref _messagesFailed, 0);
             Interlocked.Exchange(ref _messageAttachments, 0);
         }
 
@@ -69,41 +73,41 @@
             // Start reading messages from Service Bus.
             _messenger.StartReceive<EmailEvent>(1).Subscribe(async message => 
             {
-                // Default the provider if not set.
-                if (message.Provider.IsNullOrEmpty())
-                    message.Provider = _settings.DefaultEmailProvider.ToString();
-
-                // Ensure the provider exists.
-                if (!_emailProviders.TryGetValue(message.Provider, out var emailProvider))
+                try
                 {
-                    _logger.LogWarning($"{message.Provider} has no email implementation, erroring message");
-                    await _messenger.Error(message, $"{message.Provider} has no implementation");
-                    return;
-                }
+                    // Default the provider if not set.
+                    if (message.Provider.IsNullOrEmpty())
+                        message.Provider = _settings.DefaultSmsProvider.ToString();
 
-                // Get email message and attachments (if any).
-                EmailMessage email = message;
-                foreach (var attachmentId in message?.AttachmentIds)
+                    if (!_emailProviders.TryGetValue(message.Provider, out var emailProvider))
+                    {
+                        throw new InvalidOperationException($"No implementation for provider {message.Provider}");
+                    }
+
+                    EmailMessage email = message;
+
+                    // Add attachment links (if attachments are requested).
+                    if (message.AttachmentIds != null)
+                    {
+                        // Create a public link for the attachment.
+                        foreach (var attachmentId in message.AttachmentIds)
+                            email.Attachments.Add(await GetAttachment(attachmentId));
+                    }
+
+                    // Send the mail.
+                    await emailProvider.SendAsync(email);
+
+                    // When finished, complete the message.
+                    await _messenger.Complete(message);
+                    _logger.LogDebug($"Email sent successfully. To {email.To.Count} recipients, subject: {email.Subject}");
+                    Interlocked.Increment(ref _messagesProcessed);
+                }
+                catch (Exception ex)
                 {
-                    var path = $"{_settings.AttachmentContainerName}/{attachmentId}";
-                    var blobData = await _blobStorage.GetBlob(path, true);
-
-                    if (!blobData.Metadata.TryGetValue("type", out var contentType))
-                        contentType = DefaultContentType;
-                    
-                    email.Attachments.Add(new EmailAttachment { Content = await _blobStorage.DownloadBlob(path), Name = blobData.Metadata["name"], ContentType = contentType });
-                    Interlocked.Increment(ref _messageAttachments);
+                    _logger.LogError(ex, ex.Message);
+                    await _messenger.Error(message, ex.Message);
+                    Interlocked.Increment(ref _messagesFailed);
                 }
-
-                // Send the mail.
-                var result = await emailProvider.SendAsync(email);
-
-                // When finished, complete the message.
-                await _messenger.Complete(message);
-
-                _logger.LogDebug($"Email {(result ? "sent successfully" : "failed to send")} to {email.To.Count} recipients, subject: {email.Subject}");
-
-                Interlocked.Increment(ref _messagesProcessed);
             });
 
             return Task.FromResult(true);
@@ -115,6 +119,31 @@
         public Task StopAsync(CancellationToken cancellationToken)
         {
             return Task.FromResult(true);
+        }
+
+        /// <summary>Gets the attachment from storage using the attachment Id.</summary>
+        /// <param name="attachmentId">The attachment identifier to lookup.</param>
+        /// <returns>EmailAttachment.</returns>
+        /// <exception cref="System.InvalidOperationException">Cannot find attachment at {path}</exception>
+        private async Task<EmailAttachment> GetAttachment(Guid attachmentId)
+        {
+            var path = $"{_settings.AttachmentContainerName}/{attachmentId}";
+
+            // Look the attachment up in storage.
+            var blobData = await _blobStorage.GetBlob(path, true);
+            if (blobData == null)
+                throw new InvalidOperationException($"Cannot find attachment at {path}");
+
+            if (!blobData.Metadata.TryGetValue("type", out var contentType))
+                contentType = DefaultContentType;
+
+            Interlocked.Increment(ref _messageAttachments);
+
+            return new EmailAttachment { 
+                Content = await _blobStorage.DownloadBlob(path), 
+                Name = blobData.Metadata["name"], 
+                ContentType = contentType 
+            };
         }
     }
 }
