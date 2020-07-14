@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Cloud.Core.Notification;
 using Cloud.Core.Notification.Events;
 using Cloud.Core.NotificationHub.Models;
 using Cloud.Core.NotificationHub.Models.DTO;
@@ -122,7 +123,11 @@ namespace Cloud.Core.NotificationHub.Controllers
             // Raise the Sms queue event.
             SmsEvent @event = sms;
 
-            await _messenger.Send(@event, new KeyValuePair<string, object>[] { new KeyValuePair<string, object>("type", "sms") });
+            await _messenger.Send(@event, new KeyValuePair<string, object>[] { 
+                new KeyValuePair<string, object>("type", "sms"),
+                new KeyValuePair<string, object>("yyy", "xxxx")
+                
+            });
 
             // Creation accepted, sms will be sent via messaging queue.
             return Accepted();

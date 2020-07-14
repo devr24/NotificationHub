@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Cloud.Core.Notification;
 using Microsoft.Extensions.Logging;
 
 namespace Cloud.Core.NotificationHub.Providers

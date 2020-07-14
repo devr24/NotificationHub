@@ -60,7 +60,7 @@ namespace Cloud.Core.NotificationHub
                     CreateEntityIfNotExists = true,
                 }
             });
-            services.AddServiceBusSingletonNamed<IReactiveMessenger>("sms", new sbConfig.ConnectionConfig
+            services.AddServiceBusSingleton<IReactiveMessenger>(new sbConfig.ConnectionConfig
             {
                 ConnectionString = _configuration["serviceBusConnection"],
                 Receiver = new ReceiverSetup
@@ -70,6 +70,11 @@ namespace Cloud.Core.NotificationHub
                     EntitySubscriptionName = "sms",
                     EntityFilter = new System.Collections.Generic.KeyValuePair<string, string>("SmsFilter", "type LIKE '%sms%'"),
                     CreateEntityIfNotExists = true,
+                },
+                Sender = new SenderSetup { 
+                    EntityName = "",
+                    EntityType = EntityType.Topic,
+                    CreateEntityIfNotExists = true
                 }
             });
             services.AddServiceBusSingletonNamed<IReactiveMessenger>("push", new sbConfig.ConnectionConfig

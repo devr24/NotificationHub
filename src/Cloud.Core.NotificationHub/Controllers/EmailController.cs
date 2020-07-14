@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Cloud.Core.Notification;
 using Cloud.Core.Notification.Events;
 using Cloud.Core.NotificationHub.Models;
 using Cloud.Core.NotificationHub.Models.DTO;

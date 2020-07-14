@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Cloud.Core.Notification;
 using Microsoft.Extensions.Logging;
 
 namespace Cloud.Core.NotificationHub.Providers
@@ -31,7 +32,7 @@ namespace Cloud.Core.NotificationHub.Providers
         /// <exception cref="System.NotImplementedException"></exception>
         public Task<bool> SendAsync(EmailMessage email)
         {
-            _logger.LogInformation($"Email sent successfully, TO: {string.Join(",", email.To.Select(t => t.Address))}, CONTENT: {email.Content}, TEMPLATE: {email.TemplateName}");
+            _logger.LogInformation($"Email sent successfully, TO: {string.Join(",", email.To)}, CONTENT: {email.Content}, TEMPLATE: {email.TemplateName}");
 
             return Task.FromResult(true);
         }

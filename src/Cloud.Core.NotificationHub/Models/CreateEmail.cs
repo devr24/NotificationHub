@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.Linq;
+    using Cloud.Core.Notification;
     using Microsoft.AspNetCore.Http;
 
     /// <summary>Create Email.</summary>
@@ -26,7 +27,7 @@
         [Required]
         public string Subject { get; set; }
 
-        /// <summary>Gets or sets the name of the email template to use.</summary>
+        /// <summary>The email template to use.</summary>
         /// <example>Lev_SalesInvoice_en</example>
         public string TemplateName { get; set; }
 
@@ -57,7 +58,7 @@
                 TemplateName = source.TemplateName
             };
             mail.Attachments.AddRange(source.Attachments.Select(a => new EmailAttachment { Name = a.FileName, Content = a.OpenReadStream(), ContentType = a.ContentType }));
-            mail.To.AddRange(source.To.Select(a => new EmailRecipient { Name = a, Address = a}));
+            mail.To.AddRange(source.To);
 
             return mail;
         }

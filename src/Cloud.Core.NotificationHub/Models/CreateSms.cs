@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using Cloud.Core.Notification;
     using Microsoft.AspNetCore.Http;
 
     /// <summary>Create Sms message.</summary>
@@ -42,9 +43,9 @@
             var sms = new SmsMessage
             {
                 Text = source.Text,
-                To = source.To
+                
             };
-
+            sms.To.AddRange(source.To);
             return sms;
         }
     }
