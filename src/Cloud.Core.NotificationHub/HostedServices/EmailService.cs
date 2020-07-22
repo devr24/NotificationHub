@@ -1,13 +1,18 @@
 ﻿namespace Cloud.Core.NotificationHub.HostedServices
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Cloud.Core.Notification;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+    using Notification;
     using Notification.Events;
     using Services;
+    using Template.HtmlMapper;
 
     /// <summary>
     /// Class Email Service will process email related notification messages.
@@ -22,6 +27,7 @@
         private readonly IBlobStorage _blobStorage;
         private readonly AppSettings _settings;
         private readonly NamedInstanceFactory<IEmailProvider> _emailProviders;
+        private readonly ITemplateMapper _templateMapper;
         private int _messagesProcessed = 0;
         private int _messageAttachments = 0;
         private int _messagesFailed = 0;
@@ -38,7 +44,7 @@
         /// <param name="blobStorage">The BLOB storage.</param>
         /// <param name="settings">The settings.</param>
         public EmailService(NamedInstanceFactory<IEmailProvider> emailProviders, NamedInstanceFactory<IReactiveMessenger> messengers, ITelemetryLogger telemetryLogger, 
-                            ILogger<EmailService> logger, MonitorService monitor, IBlobStorage blobStorage, AppSettings settings)
+                            ILogger<EmailService> logger, MonitorService monitor, IBlobStorage blobStorage, AppSettings settings, ITemplateMapper templateMapper)
         {
             _emailProviders = emailProviders;
             _logger = logger;
@@ -46,6 +52,7 @@
             _messenger = messengers["email"];
             _blobStorage = blobStorage;
             _settings = settings;
+            _templateMapper = templateMapper;
 
             // Hook into the background timer.
             monitor.BackgroundTimerTick += LogBackgroundMetric;
@@ -86,6 +93,7 @@
                     }
 
                     EmailMessage email = message;
+                    email.Content = await GetEmailContent(message);
 
                     // Add attachment links (if attachments are requested).
                     if (message.AttachmentIds != null)
@@ -145,6 +153,59 @@
                 Name = blobData.Metadata["name"], 
                 ContentType = contentType 
             };
+        }
+
+        private async Task<string> GetEmailContent(EmailEvent email)
+        {
+            if (email.TemplateId.IsNullOrEmpty())
+                return await Task.FromResult(email.Content.ToString());
+
+
+            var template = await _templateMapper.GetTemplateContent(email.TemplateId) as HtmlTemplateResult;
+
+            if (template == null || template.TemplateFound == false)
+            {
+                return null;
+            }
+
+            // HACK
+            var obj = JsonConvert.DeserializeObject<dynamic>(email.Content.ToString());
+            JToken outer = JToken.Parse(obj.ToString());
+            JObject inner = outer.Root.Value<JObject>();
+
+            //List<string> keys = inner.Properties().Select(p => p.Name).ToList();
+
+            //foreach (string k in keys)
+            //{
+            //    Console.WriteLine(k);
+            //}
+            var innerDic = (Dictionary<string, object>)ToCollections(inner);
+
+            var content = SubstituteTemplateValues(template.TemplateKeys, innerDic, template.TemplateContent);
+            return content;
+        }
+
+
+        private object ToCollections(object o, string prefix = "")
+        {
+            if (!prefix.IsNullOrEmpty())
+                prefix += ".";
+            if (o is JObject jo) return jo.ToObject<IDictionary<string, object>>().ToDictionary(k => $"{prefix}{k.Key}", v => ToCollections(v.Value, $"{prefix}{v.Key}"));
+            if (o is JArray ja) return ja.ToObject<List<object>>().Select(s => ToCollections(s)).ToList();
+            return o;
+        }
+
+        internal string SubstituteTemplateValues(List<string> templateKeys, Dictionary<string, object> modelKeyValues, string templateContent)
+        {
+            var keyValuesToReplace = new Dictionary<string, string>();
+
+            // Replace each key in the template with the models information.
+            foreach (var k in templateKeys)
+            {
+                keyValuesToReplace.Add($"{{{{{k}}}}}", modelKeyValues[k.ToLowerInvariant()].ToString());
+            }
+
+            return templateContent.ReplaceMultiple(keyValuesToReplace);
         }
     }
 }

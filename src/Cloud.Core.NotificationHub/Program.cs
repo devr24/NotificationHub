@@ -38,12 +38,12 @@ namespace Cloud.Core.NotificationHub
                     config.UseDefaultConfigs();
 
                     // Load config from key vault.
-                    config.AddKeyVaultSecrets(config.GetValue<string>("KeyVaultInstanceName"),
+                    config.AddKeyVaultSecrets(config.GetValue<string>("SecureVaultInstanceName"),
                         "TenantId",
                         "SubscriptionId",
                         "InstrumentationKey",
-                        "serviceBusConnection",
-                        "storageConnection",
+                        "SendgridApiKey",
+                        "SendgridFromAddress",
                         "SmtpServer",
                         "SmtpPort",
                         "SmtpUsername",
@@ -51,6 +51,9 @@ namespace Cloud.Core.NotificationHub
                         "BitlyApiKey",
                         "TextlocalApiKey",
                         "ClickatelApiKey");
+
+                    // All config that's loaded - output to console as an example:
+                    Console.WriteLine(config.GetAllSettingsAsString());
                 })
                 .ConfigureLogging((context, logging) => {
                     

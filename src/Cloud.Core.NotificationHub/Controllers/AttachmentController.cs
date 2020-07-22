@@ -82,9 +82,8 @@ namespace Cloud.Core.NotificationHub.Controllers
                 return BadRequest(new ApiErrorResult(ModelState));
             }
 
-            var fileExt = Path.GetExtension(attachment.FileName).Replace(".", "");
-            var fileName = Path.GetFileNameWithoutExtension(attachment.FileName);
-            
+            var fileExt = Path.GetExtension(attachment.FileName)?.Replace(".", "");
+           
             // If the extension for the file is not on the allowed list, return bad request.
             if (!_settings.AllowedAttachmentTypesList.Contains(fileExt))
             {
@@ -96,13 +95,13 @@ namespace Cloud.Core.NotificationHub.Controllers
             var filePath = $"{_settings.AttachmentContainerName}/{id}";
 
             // Upload to storage.
-            using var uploadStream = attachment.OpenReadStream();
+            await using var uploadStream = attachment.OpenReadStream();
             await _blobStorage.UploadBlob(filePath, uploadStream, new Dictionary<string, string> {
                 { "name", attachment.FileName },
                 { "id", id.ToString() },
                 { "type", attachment.ContentType }
             });
-            uploadStream.Dispose();
+            await uploadStream.DisposeAsync();
 
             // Return the created response.
             return CreatedAtAction(nameof(GetAttachment), new { id, version = "1" }, id);

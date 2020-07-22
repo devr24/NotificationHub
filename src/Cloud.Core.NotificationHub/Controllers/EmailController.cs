@@ -1,12 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Cloud.Core.Notification;
 using Cloud.Core.Notification.Events;
 using Cloud.Core.NotificationHub.Models;
-using Cloud.Core.NotificationHub.Models.DTO;
+using Cloud.Core.Template.HtmlMapper;
 using Cloud.Core.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Cloud.Core.NotificationHub.Controllers
@@ -26,6 +30,7 @@ namespace Cloud.Core.NotificationHub.Controllers
         private readonly IReactiveMessenger _messenger;
         private readonly IBlobStorage _blobStorage;
         private readonly AppSettings _settings;
+        private readonly ITemplateMapper _templateMapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EmailController" /> class.
@@ -34,15 +39,16 @@ namespace Cloud.Core.NotificationHub.Controllers
         /// <param name="messengers">EDA messengers list.</param>
         /// <param name="blobStorage">Blob storage.</param>
         /// <param name="settings">Application settings.</param>
-        public EmailController(NamedInstanceFactory<IEmailProvider> emailProviders, NamedInstanceFactory<IReactiveMessenger> messengers, IBlobStorage blobStorage, AppSettings settings)
+        public EmailController(NamedInstanceFactory<IEmailProvider> emailProviders, ITemplateMapper templateMapper, NamedInstanceFactory<IReactiveMessenger> messengers, IBlobStorage blobStorage, AppSettings settings)
         {
             _emailProviders = emailProviders;
             _messenger = messengers["notification"];
             _blobStorage = blobStorage;
             _settings = settings;
+            _templateMapper = templateMapper;
         }
 
-        /// <summary>Send an email with attachments sychronously.</summary>
+        /// <summary>Send an email with attachments synchronously.</summary>
         /// <param name="email">The email to send.</param>
         /// <returns>Async Task IActionResult.</returns>
         [HttpPost]
@@ -60,7 +66,9 @@ namespace Cloud.Core.NotificationHub.Controllers
 
             // Default the provider if not set.
             if (email.Provider.IsNullOrDefault())
-                email.Provider = _settings.DefaultEmailProvider as EmailProviders?;
+            {
+                email.Provider = _settings.DefaultEmailProvider;
+            }
 
             if (!_emailProviders.TryGetValue(email.Provider.ToString(), out _))
             {
@@ -91,13 +99,101 @@ namespace Cloud.Core.NotificationHub.Controllers
             return Ok();
         }
 
-        /// <summary>Send an email with attachments sychronously.</summary>
+        /// <summary>Send an email with attachments, where its contents is generated using a template, synchronously.</summary>
+        /// <param name="id">Template Id to use when creating the email.</param>
+        /// <param name="email">The email to send.</param>
+        /// <returns>Async Task IActionResult.</returns>
+        [HttpPost("template/{id}")]
+        [SwaggerResponse(200, "Email sent")]
+        [SwaggerResponse(400, "Invalid create email request", typeof(ApiErrorResult))]
+        [RequestFormLimits(MultipartBodyLengthLimit = AppSettings.RequestSizeBytesLimit)] // 5mb limit
+        public async Task<IActionResult> CreateTemplatedEmail([FromRoute] string id, [FromForm] CreateTemplateEmail email)
+        {
+            // TODO: REPLACE WITH FLUENT VALIDATION AND CREATE EMAIL VALIDATOR.
+            // If the model state is invalid (i.e. required fields are missing), then return bad request.
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiErrorResult(ModelState));
+            }
+
+            email.TemplateId = id;
+
+            // Default the provider if not set.
+            if (email.Provider.IsNullOrDefault())
+            {
+                email.Provider = _settings.DefaultEmailProvider;
+            }
+
+            if (!_emailProviders.TryGetValue(email.Provider.ToString(), out _))
+            {
+                ModelState.AddModelError("Provider", $"{email.Provider.Value} has no implementation");
+                return BadRequest(new ApiErrorResult(ModelState));
+            }
+
+            // Validate the attachments, if invalid type or exceeds max allowed size.
+            foreach (var attachment in email.Attachments)
+            {
+                var fileExt = attachment.GetExtension();
+                if (!_settings.AllowedAttachmentTypesList.Contains(fileExt))
+                {
+                    ModelState.AddModelError("Extension", $"{fileExt} is not in list of valid extensions");
+                    return BadRequest(new ApiErrorResult(ModelState));
+                }
+
+                if (attachment.Length > AppSettings.IndividualFileSizeBytesLimit)
+                {
+                    ModelState.AddModelError("MaxFileSizeExceeded", $"{attachment.FileName} size of {attachment.Length} exceeds the max allowed size of {AppSettings.IndividualFileSizeBytesLimit}");
+                    return BadRequest(new ApiErrorResult(ModelState));
+                }
+            }
+
+            var template = await _templateMapper.GetTemplateContent(id.ToString()) as HtmlTemplateResult;
+
+            if (template == null || template.TemplateFound == false)
+            {
+                return NotFound();
+            }
+
+            // HACK
+            var obj = JsonConvert.DeserializeObject<dynamic>(email.TemplateContent);
+            JToken outer = JToken.Parse(obj.ToString());
+            JObject inner = outer.Root.Value<JObject>();
+
+            //List<string> keys = inner.Properties().Select(p => p.Name).ToList();
+
+            //foreach (string k in keys)
+            //{
+            //    Console.WriteLine(k);
+            //}
+            var innerDic = (Dictionary<string, object>)ToCollections(inner);
+
+            var content = SubstituteTemplateValues(template.TemplateKeys, innerDic, template.TemplateContent);
+
+            var sendEmail = new EmailMessage
+            {
+                Content  = content,
+                Subject = email.Subject
+            };
+            sendEmail.To.AddRange(email.To);
+            sendEmail.Attachments.AddRange(email.Attachments.Select(a => new EmailAttachment
+            {
+                Content = a.OpenReadStream(),
+                Name = a.FileName,
+                ContentType = a.ContentDisposition
+            }));
+
+            // Send email using the requested provider.
+            var emailProvider = _emailProviders[email.Provider.ToString()];
+            await emailProvider.SendAsync(sendEmail);
+            return Ok();
+        }
+
+        /// <summary>Send an email with attachments synchronously.</summary>
         /// <param name="email">The email to queue for sending.</param>
         /// <returns>Async Task IActionResult.</returns>
         [HttpPost("async")]
         [SwaggerResponse(202, "Email queued for delivery")]
         [SwaggerResponse(400, "Invalid create email request", typeof(ApiErrorResult))]
-        [RequestFormLimits(MultipartBodyLengthLimit = AppSettings.RequestSizeBytesLimit)] // 5mb limit
         public async Task<IActionResult> CreateEmailAsync([FromBody] EmailEvent email)
         {
             // If the model state is invalid(i.e.required fields are missing), then return bad request.
@@ -108,7 +204,7 @@ namespace Cloud.Core.NotificationHub.Controllers
             if (email.Provider.IsNullOrDefault())
                 email.Provider = _settings.DefaultSmsProvider.ToString();
 
-            if (!_emailProviders.TryGetValue(email.Provider.ToString(), out _))
+            if (!_emailProviders.TryGetValue(email.Provider, out _))
             {
                 ModelState.AddModelError("Provider", $"{email.Provider} has no implementation");
                 return BadRequest(new ApiErrorResult(ModelState));
@@ -126,11 +222,33 @@ namespace Cloud.Core.NotificationHub.Controllers
 
             // Raise the Email queue event.
             EmailEvent @event = email;
-
-            await _messenger.Send(@event, new KeyValuePair<string, object>[] { new KeyValuePair<string, object>("type", "email") });
+            @event.Content = JsonConvert.DeserializeObject<dynamic>(email.Content.ToString());
+            await _messenger.Send(@event, new [] { new KeyValuePair<string, object>("type", "email") });
             
             // Creation accepted, email will be sent via messaging queue.
             return Accepted();
+        }
+
+        private object ToCollections(object o, string prefix = "")
+        {
+            if (!prefix.IsNullOrEmpty())
+                prefix += ".";
+            if (o is JObject jo) return jo.ToObject<IDictionary<string, object>>().ToDictionary(k => $"{prefix}{k.Key}", v => ToCollections(v.Value, $"{prefix}{v.Key}"));
+            if (o is JArray ja) return ja.ToObject<List<object>>().Select(s => ToCollections(s)).ToList();
+            return o;
+        }
+
+        internal string SubstituteTemplateValues(List<string> templateKeys, Dictionary<string, object> modelKeyValues, string templateContent)
+        {
+            var keyValuesToReplace = new Dictionary<string, string>();
+
+            // Replace each key in the template with the models information.
+            foreach (var k in templateKeys)
+            {
+                keyValuesToReplace.Add($"{{{{{k}}}}}", modelKeyValues[k.ToLowerInvariant()].ToString());
+            }
+
+            return templateContent.ReplaceMultiple(keyValuesToReplace);
         }
     }
 }
