@@ -1,4 +1,6 @@
-﻿namespace Cloud.Core.NotificationHub.Models
+﻿using Newtonsoft.Json.Linq;
+
+namespace Cloud.Core.NotificationHub.Models
 {
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;

@@ -15,7 +15,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Cloud.Core" Version="3.1.3608.839" />
+    <PackageReference Include="Cloud.Core" Version="3.1.3618.864" />
     <PackageReference Include="Cloud.Core.Extensions.Configuration" Version="3.1.3608.836" />
     <PackageReference Include="Cloud.Core.Links.Bitly" Version="3.1.3601.729" />
     <PackageReference Include="Cloud.Core.Messaging.AzureServiceBus" Version="3.1.3607.826" />
@@ -23,10 +23,9 @@
     <PackageReference Include="Cloud.Core.Notification.Events" Version="3.1.3607.828" />
     <PackageReference Include="Cloud.Core.Notification.Smtp" Version="3.1.3608.841" />
     <PackageReference Include="Cloud.Core.Notification.Textlocal" Version="3.1.3601.751" />
-    <PackageReference Include="Cloud.Core.SecureVault.AzureKeyVault" Version="3.1.3601.736" />
+    <PackageReference Include="Cloud.Core.SecureVault.AzureKeyVault" Version="3.1.3610.851" />
     <PackageReference Include="Cloud.Core.Storage.AzureBlobStorage" Version="3.1.3608.844" />
     <PackageReference Include="Cloud.Core.Telemetry.AzureAppInsights" Version="3.1.3608.842" />
-    <PackageReference Include="Cloud.Core.Template.HtmlMapper" Version="3.1.3608.846" />
     <PackageReference Include="Cloud.Core.Web" Version="3.1.3601.742" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
@@ -54,6 +53,11 @@
 
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\CLOUD.CORE DONE\Cloud.Core.Notification.Sendgrid\src\Cloud.Core.Notification.Sendgrid\Cloud.Core.Notification.Sendgrid.csproj" />
+    <ProjectReference Include="..\..\..\CLOUD.CORE DONE\Cloud.Core.Template.HtmlMapper\src\Cloud.Core.Template.HtmlMapper\Cloud.Core.Template.HtmlMapper.csproj" />
   </ItemGroup>
 
   <ItemGroup>

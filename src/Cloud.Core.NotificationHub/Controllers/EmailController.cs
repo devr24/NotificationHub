@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cloud.Core.Extensions;
 using Cloud.Core.Notification;
 using Cloud.Core.Notification.Events;
 using Cloud.Core.NotificationHub.Models;
@@ -120,10 +121,9 @@ namespace Cloud.Core.NotificationHub.Controllers
 
             // Default the provider if not set.
             if (email.Provider.IsNullOrDefault())
-            {
                 email.Provider = _settings.DefaultEmailProvider;
-            }
 
+            // Attempt to get the provider (which will be used for sending the mail).
             if (!_emailProviders.TryGetValue(email.Provider.ToString(), out _))
             {
                 ModelState.AddModelError("Provider", $"{email.Provider.Value} has no implementation");
@@ -147,44 +147,60 @@ namespace Cloud.Core.NotificationHub.Controllers
                 }
             }
 
-            var template = await _templateMapper.GetTemplateContent(id.ToString()) as HtmlTemplateResult;
-
-            if (template == null || template.TemplateFound == false)
-            {
-                return NotFound();
-            }
-
-            // HACK
-            var obj = JsonConvert.DeserializeObject<dynamic>(email.TemplateContent);
-            JToken outer = JToken.Parse(obj.ToString());
-            JObject inner = outer.Root.Value<JObject>();
-
-            //List<string> keys = inner.Properties().Select(p => p.Name).ToList();
-
-            //foreach (string k in keys)
-            //{
-            //    Console.WriteLine(k);
-            //}
-            var innerDic = (Dictionary<string, object>)ToCollections(inner);
-
-            var content = SubstituteTemplateValues(template.TemplateKeys, innerDic, template.TemplateContent);
-
-            var sendEmail = new EmailMessage
-            {
-                Content  = content,
-                Subject = email.Subject
-            };
-            sendEmail.To.AddRange(email.To);
-            sendEmail.Attachments.AddRange(email.Attachments.Select(a => new EmailAttachment
-            {
-                Content = a.OpenReadStream(),
-                Name = a.FileName,
-                ContentType = a.ContentDisposition
-            }));
-
-            // Send email using the requested provider.
             var emailProvider = _emailProviders[email.Provider.ToString()];
-            await emailProvider.SendAsync(sendEmail);
+
+            // We have a special case for sendgid, as it has its own templating engine.
+            if (email.Provider.ToString().Contains("Sendgrid") && _settings.UseSendgridsTemplating)
+            {
+                var sendEmail = new EmailTemplateMessage
+                {
+                    TemplateId = email.TemplateId,
+                    TemplateObject = email.TemplateContent,
+                    Subject = email.Subject
+                };
+                sendEmail.To.AddRange(email.To);
+                sendEmail.Attachments.AddRange(email.Attachments.Select(a => new EmailAttachment
+                {
+                    Content = a.OpenReadStream(),
+                    Name = a.FileName,
+                    ContentType = a.ContentDisposition
+                }));
+
+                // Send email using the requested provider.
+                await emailProvider.SendAsync(sendEmail);
+            }
+            else
+            {
+                var template = await _templateMapper.GetTemplateContent(id);
+
+                if (template == null)
+                {
+                    return NotFound();
+                }
+
+                var obj = JsonConvert.DeserializeObject<dynamic>(email.TemplateContent);
+                var model = JToken.Parse(email.TemplateContent);
+
+
+                var result = template.TemplateContent.SubstitutePlaceholders(model, "{{","}}");
+
+                var sendEmail = new EmailMessage
+                {
+                    Content  = result.SubstitutedContent,
+                    Subject = email.Subject
+                };
+                sendEmail.To.AddRange(email.To);
+                sendEmail.Attachments.AddRange(email.Attachments.Select(a => new EmailAttachment
+                {
+                    Content = a.OpenReadStream(),
+                    Name = a.FileName,
+                    ContentType = a.ContentDisposition
+                }));
+
+                // Send email using the requested provider.
+                await emailProvider.SendAsync(sendEmail);
+            }
+            
             return Ok();
         }
 
@@ -222,33 +238,15 @@ namespace Cloud.Core.NotificationHub.Controllers
 
             // Raise the Email queue event.
             EmailEvent @event = email;
-            @event.Content = JsonConvert.DeserializeObject<dynamic>(email.Content.ToString());
+            if (!email.TemplateId.IsNullOrDefault())
+                @event.Content = JsonConvert.DeserializeObject<dynamic>(email.Content.ToString());
+            else
+                @event.Content = email.Content.ToString();
+
             await _messenger.Send(@event, new [] { new KeyValuePair<string, object>("type", "email") });
             
             // Creation accepted, email will be sent via messaging queue.
             return Accepted();
-        }
-
-        private object ToCollections(object o, string prefix = "")
-        {
-            if (!prefix.IsNullOrEmpty())
-                prefix += ".";
-            if (o is JObject jo) return jo.ToObject<IDictionary<string, object>>().ToDictionary(k => $"{prefix}{k.Key}", v => ToCollections(v.Value, $"{prefix}{v.Key}"));
-            if (o is JArray ja) return ja.ToObject<List<object>>().Select(s => ToCollections(s)).ToList();
-            return o;
-        }
-
-        internal string SubstituteTemplateValues(List<string> templateKeys, Dictionary<string, object> modelKeyValues, string templateContent)
-        {
-            var keyValuesToReplace = new Dictionary<string, string>();
-
-            // Replace each key in the template with the models information.
-            foreach (var k in templateKeys)
-            {
-                keyValuesToReplace.Add($"{{{{{k}}}}}", modelKeyValues[k.ToLowerInvariant()].ToString());
-            }
-
-            return templateContent.ReplaceMultiple(keyValuesToReplace);
         }
     }
 }

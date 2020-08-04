@@ -2,6 +2,7 @@
 using Cloud.Core.Links.Bitly;
 using Cloud.Core.Messaging.AzureServiceBus.Models;
 using Cloud.Core.Notification.Clickatel;
+using Cloud.Core.Notification.Sendgrid;
 using Cloud.Core.Notification.Smtp;
 using Cloud.Core.Notification.Textlocal;
 using Cloud.Core.NotificationHub.HostedServices;
@@ -107,9 +108,11 @@ namespace Cloud.Core.NotificationHub
             });
             services.AddSingleton(new ClickatelConfig { ApiAuthorisationKey = _configuration["ClickatelApiKey"] });
             services.AddSingleton(new TextlocalConfig { ApiAuthorisationKey = _configuration["TextlocalApiKey"] });
+            services.AddSingleton(new SendgridConfig() { ApiAuthorisationKey = _configuration["SendgridApiKey"], FromAddress = _configuration["SendgridFromAddress"]});
 
             // Add email providers.
             services.AddEmailProvider<SmtpProvider>()
+                .AddEmailProvider<SendgridProvider>()
                     .AddEmailProvider<DummyEmailProvider>();
 
             // Add sms providers.

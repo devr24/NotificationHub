@@ -47,7 +47,7 @@ namespace Cloud.Core.NotificationHub.Controllers
         }
 
         /// <summary>
-        /// Subscribe to a push notification - will implement using SignalR.
+        /// Subscribe to a push notification - will implement using tech such as event hub - could potentially push to teams or slack etc as well.
         /// </summary>
         /// <returns>IEnumerable&lt;System.String&gt;.</returns>
         /// <exception cref="InvalidOperationException">Somethings gone wrong!</exception>

@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cloud.Core.Extensions;
 using Cloud.Core.NotificationHub.Models;
 using Cloud.Core.Template.HtmlMapper;
 using Cloud.Core.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -54,6 +56,17 @@ namespace Cloud.Core.NotificationHub.Controllers
             return Ok(template);
         }
 
+        /// <summary>
+        /// Gets all templates.
+        /// </summary>
+        /// <returns>IActionResult.</returns>
+        [HttpGet]
+        [SwaggerResponse(200, "Templates", typeof(List<ITemplateResult>))]
+        public async Task<IActionResult> GetTemplates()
+        {
+            return Ok();
+        }
+
         /// <summary>Retrieve template from storage and map the model into the content.</summary>
         /// <param name="id">Id of template to retrieve.</param>
         /// <param name="model">The model to map.</param>
@@ -63,34 +76,44 @@ namespace Cloud.Core.NotificationHub.Controllers
         [SwaggerResponse(200, "Template", typeof(FileStreamResult))]
         public async Task<IActionResult> GetTemplateAsPdf([FromRoute]Guid id, [FromBody] dynamic model)
         {
+            // Get the dynamically passed in model as a JToken.  This is used for the placeholder substitution.
+            JToken outer = JToken.Parse(model.ToString());
+            var templateResult = await _templateMapper.MapTemplateId(id.ToString(), outer);
+
+            // If unsuccessful, return not found result.
+            if (templateResult is HtmlTemplateResult res)
+            {
+                if (res.TemplateFound == false)
+                    return NotFound(res);
+            }
+
+            // Otherwise, we generate the PDF stream and return.
+            var pdfService = new HtmlToPdf.HtmlToPdfService();
+            var pdfStream = pdfService.GetPdfStream(templateResult.TemplateContent);
+
+            return new FileStreamResult(pdfStream, PdfContentType)
+            {
+                FileDownloadName = $"{id}.pdf"
+            };
+        }
+
+        /// <summary>
+        /// Delete a specific template.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <returns>IActionResult.</returns>
+        [HttpDelete("{id}")]
+        [SwaggerResponse(404, "Template not found", typeof(ApiErrorResult))]
+        [SwaggerResponse(200, "Template", typeof(void))]
+        public async Task<IActionResult> DeleteTemplate([FromRoute]Guid id)
+        {
             var template = await _templateMapper.GetTemplateContent(id.ToString()) as HtmlTemplateResult;
 
             if (template == null || template.TemplateFound == false)
             {
                 return NotFound();
             }
-
-            JToken outer = JToken.Parse(model.ToString());
-            JObject inner = outer.Root.Value<JObject>();
-
-            //List<string> keys = inner.Properties().Select(p => p.Name).ToList();
-
-            //foreach (string k in keys)
-            //{
-            //    Console.WriteLine(k);
-            //}
-            var innerDic = (Dictionary<string, object>)ToCollections(inner);
-            var modelKeyValues = new RouteValueDictionary(model);
-
-            var content = SubstituteTemplateValues(template.TemplateKeys, innerDic, template.TemplateContent);
-            var pdfService = new HtmlToPdf.HtmlToPdfService();
-
-            
-
-            return new FileStreamResult(pdfService.GetPdfStream(content), PdfContentType)
-            {
-                FileDownloadName = $"{id}.pdf"
-            };
+            return Ok(template);
         }
 
         /// <summary>Add the template content.</summary>
@@ -117,26 +140,19 @@ namespace Cloud.Core.NotificationHub.Controllers
             return CreatedAtAction(nameof(GetTemplate), new { id, version = "1" }, result);
         }
 
-        private object ToCollections(object o, string prefix = "")
+        /// <summary>
+        /// Updates a specific template.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <param name="template">The template.</param>
+        /// <returns>IActionResult.</returns>
+        [HttpPut("{id}")]
+        [RequestFormLimits(MultipartBodyLengthLimit = AppSettings.IndividualFileSizeBytesLimit)] // 1mb limit
+        [SwaggerResponse(400, "Invalid upload template request", typeof(ApiErrorResult))]
+        [SwaggerResponse(200, "Template uploaded", typeof(ITemplateResult))]
+        public async Task<IActionResult> UpdateTemplate([FromRoute]Guid id, [FromBody] UpdateTemplate template)
         {
-            if (!prefix.IsNullOrEmpty())
-                prefix += ".";
-            if (o is JObject jo) return jo.ToObject<IDictionary<string, object>>().ToDictionary(k => $"{prefix}{k.Key}", v => ToCollections(v.Value, $"{prefix}{v.Key}"));
-            if (o is JArray ja) return ja.ToObject<List<object>>().Select(s => ToCollections(s)).ToList();
-            return o;
-        }
-
-        internal string SubstituteTemplateValues(List<string> templateKeys, Dictionary<string,object> modelKeyValues, string templateContent)
-        {
-            var keyValuesToReplace = new Dictionary<string, string>();
-
-            // Replace each key in the template with the models information.
-            foreach (var k in templateKeys)
-            {
-                keyValuesToReplace.Add($"{{{{{k}}}}}", modelKeyValues[k.ToLowerInvariant()].ToString());
-            }
-
-            return templateContent.ReplaceMultiple(keyValuesToReplace);
+            return Ok();
         }
     }
 }

@@ -39,6 +39,9 @@ namespace Cloud.Core.NotificationHub
         /// <summary>Gets the allowed attachment types list.</summary>
         public List<string> AllowedAttachmentTypesList { get; private set; }
 
+        /// <summary>Whether to use Sendgrids own templating functionality or our own.</summary>
+        public bool UseSendgridsTemplating { get; set; }
+
         /// <summary>Gets or sets the allowed file types for attachment.</summary>
         public string AllowedAttachmentTypes {
             get => _allowedTypes;
