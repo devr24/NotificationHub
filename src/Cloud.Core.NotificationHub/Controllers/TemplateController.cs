@@ -15,7 +15,8 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace Cloud.Core.NotificationHub.Controllers
 {
     /// <summary>
-    /// [DRAFT] Template controller for getting and uploading templates into the system.
+    /// [DRAFT] Move to Document Engine API
+    /// Template controller for getting and uploading templates into the system.
     /// Implements the <see cref="ControllerBase" />
     /// </summary>
     /// <seealso cref="ControllerBase" />
@@ -25,8 +26,6 @@ namespace Cloud.Core.NotificationHub.Controllers
     [Produces("application/json")]
     public class TemplateController : ControllerBase
     {
-        private const string DefaultContentType = "application/octet-stream";
-        private const string PdfContentType = "application/pdf";
         private readonly ITemplateMapper _templateMapper;
 
         /// <summary>
@@ -64,37 +63,8 @@ namespace Cloud.Core.NotificationHub.Controllers
         [SwaggerResponse(200, "Templates", typeof(List<ITemplateResult>))]
         public async Task<IActionResult> GetTemplates()
         {
-            return Ok();
-        }
-
-        /// <summary>Retrieve template from storage and map the model into the content.</summary>
-        /// <param name="id">Id of template to retrieve.</param>
-        /// <param name="model">The model to map.</param>
-        /// <returns>Template.</returns>
-        [HttpPost("{id}/pdf")]
-        [SwaggerResponse(404, "Template not found", typeof(ApiErrorResult))]
-        [SwaggerResponse(200, "Template", typeof(FileStreamResult))]
-        public async Task<IActionResult> GetTemplateAsPdf([FromRoute]Guid id, [FromBody] dynamic model)
-        {
-            // Get the dynamically passed in model as a JToken.  This is used for the placeholder substitution.
-            JToken outer = JToken.Parse(model.ToString());
-            var templateResult = await _templateMapper.MapTemplateId(id.ToString(), outer);
-
-            // If unsuccessful, return not found result.
-            if (templateResult is HtmlTemplateResult res)
-            {
-                if (res.TemplateFound == false)
-                    return NotFound(res);
-            }
-
-            // Otherwise, we generate the PDF stream and return.
-            var pdfService = new HtmlToPdf.HtmlToPdfService();
-            var pdfStream = pdfService.GetPdfStream(templateResult.TemplateContent);
-
-            return new FileStreamResult(pdfStream, PdfContentType)
-            {
-                FileDownloadName = $"{id}.pdf"
-            };
+            //TODO: Implement this.
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -152,7 +122,8 @@ namespace Cloud.Core.NotificationHub.Controllers
         [SwaggerResponse(200, "Template uploaded", typeof(ITemplateResult))]
         public async Task<IActionResult> UpdateTemplate([FromRoute]Guid id, [FromBody] UpdateTemplate template)
         {
-            return Ok();
+            //TODO: Implement.
+            throw new NotImplementedException();
         }
     }
 }

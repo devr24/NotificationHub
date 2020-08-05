@@ -253,3 +253,4 @@ paket-files/
 /src/Tests/coverage.json
 /src/Tests/coverage.opencover.xml
 Cloud.Core*.xml
+libman.json

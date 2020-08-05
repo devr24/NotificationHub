@@ -16,7 +16,7 @@
   
   <ItemGroup>
     <PackageReference Include="Cloud.Core" Version="3.1.3618.864" />
-    <PackageReference Include="Cloud.Core.Extensions.Configuration" Version="3.1.3608.836" />
+    <PackageReference Include="Cloud.Core.Extensions.Configuration" Version="3.1.3618.865" />
     <PackageReference Include="Cloud.Core.Links.Bitly" Version="3.1.3601.729" />
     <PackageReference Include="Cloud.Core.Messaging.AzureServiceBus" Version="3.1.3607.826" />
     <PackageReference Include="Cloud.Core.Notification.Clickatel" Version="3.1.3601.732" />
@@ -29,7 +29,7 @@
     <PackageReference Include="Cloud.Core.Web" Version="3.1.3601.742" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
   </ItemGroup>
 
   <ItemGroup>
