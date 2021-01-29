@@ -1,4 +1,4 @@
-# NotificationHub
+# Notification Hub
 
 ## Problem Description
 There is a need from many solutions to send notifications for particular events. An example would be sending an Order Invoice email to a customer when an order is created or sending an Sms notification of a tracking event i.e Order is being packed, Order shipped, Order is with the courier etc.
