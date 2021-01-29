@@ -1,15 +1,13 @@
-# Cloud.Core.NotificationHub
+# NotificationHub
 
 ## Problem Description
-There is a need from many solutions to send notifications for particular events. An example would be sending an Order Invoice email to a customer when an order is created or sending an Sms notifications tracking events i.e Order is being packed, Order shipped, Order is with the courier etc.
+There is a need from many solutions to send notifications for particular events. An example would be sending an Order Invoice email to a customer when an order is created or sending an Sms notification of a tracking event i.e Order is being packed, Order shipped, Order is with the courier etc.
 
 
 ## Solution Overview
-Development of a single “Notification Hub” microservice, that can exist on the evo platform, handling the brokering of multiple notification types to recipients.
+Development of a simple “Notification Hub” microservice, that can broker notifications of multiple types to recipients.  This can be carried out in an event-driven or request-driven manner.  If request driven, it can be syncrhonous or asynchronous.
 
-The two examples mentioned above, email and sms, would be examples of notification types that can be generated but the hub will be extensible for future types.
-
-The Notification Hub should be a true microservice that is self-sufficient (no coupling to other code bases in our solution), able to run independently and can be triggered by events (EDA) and triggered by requests (web API).
+The two examples of notification types are email and sms, others may be push notifications to say MS Teams or Slack.  But the potential for extension to any provider type is there.
 
 The following diagram outlines the proposed design:
 
